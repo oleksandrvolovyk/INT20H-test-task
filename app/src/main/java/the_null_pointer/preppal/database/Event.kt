@@ -12,10 +12,10 @@ data class Event(
     val id: Long,
 
     @ColumnInfo(name = "summary")
-    val summary: String?,
+    val summary: String,
 
     @ColumnInfo(name = "type")
-    val type: String?,
+    val type: EnumType,
 
     @ColumnInfo(name = "location")
     val location: String?,
@@ -25,11 +25,11 @@ data class Event(
 
     @ColumnInfo(name = "start")
     @TypeConverters(DateConverter::class)
-    val start: Date?,
+    val start: Date,
 
     @ColumnInfo(name = "end")
     @TypeConverters(DateConverter::class)
-    val end: Date?,
+    val end: Date,
 
     @ColumnInfo(name = "recurrence")
     val recurrence: String?,
@@ -42,4 +42,8 @@ data class Event(
 
     @ColumnInfo(name = "max_score")
     val maxScore: Double?
-)
+) {
+    enum class EnumType {
+        Lecture, Exam, Lab, Practice, Task, Seminar, Workshop
+    }
+}
