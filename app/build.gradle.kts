@@ -60,6 +60,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.room:room-common:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     val navVersion = "2.7.6"
 
