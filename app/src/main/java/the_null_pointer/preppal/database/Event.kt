@@ -15,7 +15,7 @@ data class Event(
     val summary: String,
 
     @ColumnInfo(name = "type")
-    val type: EnumType,
+    val type: EventType,
 
     @ColumnInfo(name = "location")
     val location: String?,
@@ -32,10 +32,10 @@ data class Event(
     val end: Date,
 
     @ColumnInfo(name = "recurrence")
-    val recurrence: String?,
+    val recurrence: RecurrenceType?,
 
     @ColumnInfo(name = "reminder")
-    val reminder: String?,
+    val reminder: Long?,
 
     @ColumnInfo(name = "score")
     val score: Double?,
@@ -43,7 +43,11 @@ data class Event(
     @ColumnInfo(name = "max_score")
     val maxScore: Double?
 ) {
-    enum class EnumType {
+    enum class EventType {
         Lecture, Exam, Lab, Practice, Task, Seminar, Workshop
+    }
+
+    enum class RecurrenceType {
+        Daily, EveryWorkDay, EveryWeekend, Weekly, Monthly
     }
 }
