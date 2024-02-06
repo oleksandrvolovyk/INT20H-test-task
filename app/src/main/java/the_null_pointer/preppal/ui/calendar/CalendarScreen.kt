@@ -56,6 +56,7 @@ import com.kizitonwose.calendar.core.previousMonth
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
+import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.util.TimeUtil.getHourAsString
 import the_null_pointer.preppal.util.TimeUtil.getMinuteAsString
@@ -296,7 +297,7 @@ private fun EventDetails(uiEvent: Event) {
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = uiEvent.type.toString(),
+                text = stringResource(uiEvent.type.stringResourceId),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Black,

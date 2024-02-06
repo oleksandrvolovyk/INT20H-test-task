@@ -5,7 +5,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import java.time.LocalDateTime
+import the_null_pointer.preppal.R
 
 @Entity
 data class Event(
@@ -44,11 +44,34 @@ data class Event(
     val maxGrade: Double? = null
 ) {
     enum class Type {
-        Lecture, Exam, Lab, Practice, Task, Seminar, Workshop
+        Lecture, Exam, Lab, Practice, Task, Seminar;
+
+        companion object {
+            val Type.stringResourceId: Int
+                get() = when (this) {
+                    Lecture -> R.string.lecture
+                    Exam -> R.string.exam
+                    Lab -> R.string.lab
+                    Practice -> R.string.practice
+                    Task -> R.string.task
+                    Seminar -> R.string.seminar
+                }
+        }
     }
 
     enum class RecurrenceType {
-        Daily, EveryWorkDay, EveryWeekend, Weekly, Monthly
+        Daily, EveryWorkDay, EveryWeekend, Weekly, Monthly;
+
+        companion object {
+            val RecurrenceType.stringResourceId: Int
+                get() = when (this) {
+                    Daily -> R.string.daily
+                    EveryWorkDay -> R.string.every_work_day
+                    EveryWeekend -> R.string.every_weekend
+                    Weekly -> R.string.weekly
+                    Monthly -> R.string.monthly
+                }
+        }
     }
 }
 

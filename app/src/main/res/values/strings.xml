@@ -9,4 +9,18 @@
     <string name="cancel">Відміна</string>
     <string name="not_choosen_yet">Ще не обрано</string>
     <string name="submit_event">Створити подію</string>
+    <string name="event_summary_placeholder">Назва події</string>
+    <string name="from">З</string>
+    <string name="to">До</string>
+    <string name="lecture">Лекція</string>
+    <string name="exam">Екзамен</string>
+    <string name="lab">Лабораторне заняття</string>
+    <string name="practice">Практичне заняття</string>
+    <string name="task">Завдання</string>
+    <string name="seminar">Семінар</string>
+    <string name="daily">Щодня</string>
+    <string name="every_work_day">По буднях</string>
+    <string name="every_weekend">По вихідних</string>
+    <string name="weekly">Щотижня</string>
+    <string name="monthly">Щомісячно</string>
 </resources>
