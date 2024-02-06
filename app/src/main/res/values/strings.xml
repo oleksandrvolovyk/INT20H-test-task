@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">PrepPal</string>
+    <string name="scoreBoard">Журнал оцінок</string>
+    <string name="progress">Прогрес</string>
+    <string name="sorting">Сортувати</string>
+
     <string name="add_new_event">Додати подію</string>
     <string name="OK">OK</string>
     <string name="cancel">Відміна</string>
