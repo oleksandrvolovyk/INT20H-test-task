@@ -82,7 +82,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // kizitonwose/Calendar
-    implementation("com.kizitonwose.calendar:compose:2.4.1")
+    implementation("com.kizitonwose.calendar:compose:2.5.0-beta01")
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.48")
