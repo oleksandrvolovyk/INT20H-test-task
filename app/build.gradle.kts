@@ -30,6 +30,9 @@ android {
         }
     }
     compileOptions {
+        // Enable support for the new language APIs (Needed for kizitonwose/Calendar)
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -67,6 +70,12 @@ dependencies {
     val navVersion = "2.7.6"
 
     implementation("androidx.navigation:navigation-compose:$navVersion")
+
+    // Needed for kizitonwose/Calendar
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // kizitonwose/Calendar
+    implementation("com.kizitonwose.calendar:compose:2.4.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
