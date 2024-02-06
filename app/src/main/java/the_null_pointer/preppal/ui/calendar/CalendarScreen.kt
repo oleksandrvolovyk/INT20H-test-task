@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,8 +57,8 @@ import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
-import the_null_pointer.preppal.util.TimeUtil.getHour
-import the_null_pointer.preppal.util.TimeUtil.getMinute
+import the_null_pointer.preppal.util.TimeUtil.getHourAsString
+import the_null_pointer.preppal.util.TimeUtil.getMinuteAsString
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -81,12 +80,13 @@ fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> 
     val endMonth = remember { currentMonth.plusMonths(500) }
     var selection by remember { mutableStateOf<CalendarDay?>(null) }
     val daysOfWeek = remember { daysOfWeek() }
-    val eventsInSelectedDate = remember {
-        derivedStateOf {
-            val date = selection?.date
-            if (date == null) emptyList() else events[date].orEmpty()
-        }
+    var eventsInSelectedDate by remember { mutableStateOf<List<Event>>(emptyList()) }
+
+    LaunchedEffect(selection) {
+        val date = selection?.date
+        eventsInSelectedDate = if (date == null) emptyList() else events[date].orEmpty()
     }
+
     // StatusBarColorUpdateEffect(toolbarColor)
     Column(
         modifier = Modifier
@@ -153,7 +153,7 @@ fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> 
             )
             Divider(color = pageBackgroundColor)
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(items = eventsInSelectedDate.value) { event ->
+                items(items = eventsInSelectedDate) { event ->
                     EventInformation(event)
                 }
             }
@@ -260,8 +260,8 @@ private fun LazyItemScope.EventInformation(event: Event) {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "${event.start.getHour()}:${event.start.getMinute()}\n" +
-                        "${event.end.getHour()}:${event.end.getMinute()}",
+                text = "${event.start.getHourAsString()}:${event.start.getMinuteAsString()}\n" +
+                        "${event.end.getHourAsString()}:${event.end.getMinuteAsString()}",
                 textAlign = TextAlign.Center,
                 lineHeight = 17.sp,
                 fontSize = 12.sp,

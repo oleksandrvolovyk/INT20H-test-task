@@ -92,7 +92,7 @@ fun NewEventScreen(
             // Start time picker
             Box(contentAlignment = Alignment.Center) {
                 Button(onClick = { showStartTimePicker = true }) {
-                    Text(text = "$startHour:$startMinute")
+                    Text(text = "${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}")
                 }
             }
 
@@ -134,7 +134,7 @@ fun NewEventScreen(
             // End time picker
             Box(contentAlignment = Alignment.Center) {
                 Button(onClick = { showEndTimePicker = true }) {
-                    Text(text = "$endHour:$endMinute")
+                    Text(text = "${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}")
                 }
             }
 

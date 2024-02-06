@@ -15,12 +15,29 @@ object TimeUtil {
     }
 
     /**
+     * Gets hour of day from milliseconds as String.
+     * @return                  Hour of day (24-hour format).
+     */
+    fun Long.getHourAsString(): String {
+        return this.getHour().toString().padStart(2, '0')
+    }
+
+    /**
      * Gets minute from milliseconds.
      * @return                  Minute.
      */
     fun Long.getMinute(): Int {
         calendar.timeInMillis = this
         return calendar.get(Calendar.MINUTE)
+    }
+
+
+    /**
+     * Gets minute from milliseconds as String.
+     * @return                  Hour of day (24-hour format).
+     */
+    fun Long.getMinuteAsString(): String {
+        return this.getMinute().toString().padStart(2, '0')
     }
 
     /**
