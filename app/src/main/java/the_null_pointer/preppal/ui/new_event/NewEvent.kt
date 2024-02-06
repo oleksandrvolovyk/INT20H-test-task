@@ -15,8 +15,13 @@ fun NewEvent(viewModel: NewEventViewModel = hiltViewModel()) {
         uiState = uiState,
         onSummaryValueChange = { viewModel.updateSummary(it) },
         onEventTypeChange = { viewModel.updateEventType(it) },
+        onEventRecurrenceTypeChange = { viewModel.updateRecurrenceType(it) },
         onStartDateChange = { viewModel.updateStartDate(it) },
         onEndDateChange = { viewModel.updateEndDate(it) },
+        onReminderStateChange = { viewModel.updateReminderState(it) },
+        onLocationStateChange = { viewModel.updateLocationState(it) },
+        onLocationChange = { latitude, longitude -> viewModel.updateLocation(latitude, longitude) },
+        onGradedChange = { viewModel.updateGradedState(it) },
         onSubmitEventButtonClick = { viewModel.submitEvent() }
     )
 }

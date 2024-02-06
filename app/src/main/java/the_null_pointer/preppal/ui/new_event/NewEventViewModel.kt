@@ -10,14 +10,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.EventRepository
+import the_null_pointer.preppal.data.Location
 import the_null_pointer.preppal.data.TimestampMillis
 import javax.inject.Inject
 
 data class NewEventScreenUiState(
     val summary: String = "",
     val type: Event.Type = Event.Type.Task,
+    val recurrenceType: Event.RecurrenceType? = null,
     val start: TimestampMillis = System.currentTimeMillis(),
-    val end: TimestampMillis = System.currentTimeMillis()
+    val end: TimestampMillis = System.currentTimeMillis(),
+    val isReminderEnabled: Boolean = false,
+
+    val isLocationEnabled: Boolean = false,
+    val locationLatitude: Double? = null,
+    val locationLongitude: Double? = null,
+
+    val isGraded: Boolean = false
 )
 
 // TODO: Finish "New Event" screen
@@ -42,6 +51,12 @@ class NewEventViewModel @Inject constructor(
         }
     }
 
+    fun updateRecurrenceType(newRecurrenceType: Event.RecurrenceType?) {
+        _uiState.update {
+            it.copy(recurrenceType = newRecurrenceType)
+        }
+    }
+
     fun updateStartDate(newStartDateMillis: Long) {
         _uiState.update {
             it.copy(
@@ -58,13 +73,56 @@ class NewEventViewModel @Inject constructor(
         }
     }
 
+    fun updateReminderState(newReminderState: Boolean) {
+        _uiState.update {
+            it.copy(
+                isReminderEnabled = newReminderState
+            )
+        }
+    }
+
+    fun updateLocationState(newLocationState: Boolean) {
+        _uiState.update {
+            it.copy(
+                isLocationEnabled = newLocationState
+            )
+        }
+    }
+
+    fun updateLocation(latitude: Double, longitude: Double) {
+        _uiState.update {
+            it.copy(
+                locationLatitude = latitude,
+                locationLongitude = longitude
+            )
+        }
+    }
+
+    fun updateGradedState(newGradedState: Boolean) {
+        _uiState.update {
+            it.copy(
+                isGraded = newGradedState
+            )
+        }
+    }
+
     fun submitEvent() = viewModelScope.launch {
+        val latitude = uiState.value.locationLatitude
+        val longitude = uiState.value.locationLongitude
+
+        val location =
+            if (latitude != null && longitude != null) Location(latitude, longitude) else null
+
         eventRepository.insert(
             Event(
                 summary = uiState.value.summary,
                 type = uiState.value.type,
+                location = location,
                 start = uiState.value.start,
-                end = uiState.value.end
+                end = uiState.value.end,
+                recurrence = uiState.value.recurrenceType,
+                reminder = emptyList(), // TODO
+                graded = uiState.value.isGraded
             )
         )
     }

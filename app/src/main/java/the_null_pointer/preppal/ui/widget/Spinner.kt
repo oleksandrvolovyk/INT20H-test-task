@@ -19,16 +19,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Spinner(
-    list: List<String>,
-    selected: String,
-    onSelectionChanged: (String) -> Unit,
+fun <T> Spinner(
+    items: List<Pair<T, String>>,
+    selected: T,
+    onSelectionChanged: (T?) -> Unit,
     modifier: Modifier = Modifier,
-    initialExpandedState: Boolean = false
+    initialExpandedState: Boolean = false,
+    canSelectNothing: Boolean = false,
+    nothingOptionString: String = ""
 ) {
     var expanded by remember { mutableStateOf(initialExpandedState) }
 
@@ -42,7 +43,7 @@ fun Spinner(
             verticalAlignment = Alignment.Top,
         ) {
             Text(
-                text = selected,
+                text = items.find { it.first == selected }?.second ?: nothingOptionString,
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -54,18 +55,33 @@ fun Spinner(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.fillMaxWidth()   // delete this modifier and use .wrapContentWidth() if you would like to wrap the dropdown menu around the content
             ) {
-                list.forEach { listEntry ->
-
+                if (canSelectNothing) {
                     DropdownMenuItem(
                         onClick = {
                             expanded = false
-                            onSelectionChanged(listEntry)
+                            onSelectionChanged(null)
                         },
                         text = {
                             Text(
-                                text = listEntry,
+                                text = nothingOptionString,
                                 modifier = Modifier
-                                    //.wrapContentWidth()  //optional instead of fillMaxWidth
+                                    .fillMaxWidth()
+                                    .align(Alignment.Start)
+                            )
+                        },
+                    )
+                }
+
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        onClick = {
+                            expanded = false
+                            onSelectionChanged(item.first)
+                        },
+                        text = {
+                            Text(
+                                text = item.second,
+                                modifier = Modifier
                                     .fillMaxWidth()
                                     .align(Alignment.Start)
                             )
@@ -73,7 +89,6 @@ fun Spinner(
                     )
                 }
             }
-
         }
     }
 }
