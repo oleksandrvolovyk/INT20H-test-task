@@ -73,7 +73,9 @@ private const val MILLISECONDS_IN_DAY = 86_400_000
 
 @Composable
 fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> Unit = {}) {
-    val events = uiState.events.groupBy { LocalDate.ofEpochDay(it.start / MILLISECONDS_IN_DAY) }
+    val events = uiState.events
+        .sortedBy { it.start }
+        .groupBy { LocalDate.ofEpochDay(it.start / MILLISECONDS_IN_DAY) }
 
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(500) }
