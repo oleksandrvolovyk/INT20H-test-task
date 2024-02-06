@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">PrepPal</string>
+    <string name="add_new_event">Додати подію</string>
+    <string name="OK">OK</string>
+    <string name="cancel">Відміна</string>
+    <string name="not_choosen_yet">Ще не обрано</string>
+    <string name="submit_event">Створити подію</string>
 </resources>

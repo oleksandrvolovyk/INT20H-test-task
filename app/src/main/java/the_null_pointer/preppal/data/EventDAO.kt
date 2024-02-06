@@ -1,4 +1,4 @@
-package the_null_pointer.preppal.database
+package the_null_pointer.preppal.data
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EventDAO {
     @Query("SELECT * FROM event")
-    fun getAll(): Flow<List<Event>>
+    fun observeAll(): Flow<List<Event>>
 
     @Query("SELECT * FROM event WHERE id IN (:eventIds)")
-    fun loadAllByIds(eventIds: LongArray): Flow<List<Event>>
+    fun getAllByIds(eventIds: LongArray): List<Event>
 
     @Query("SELECT * FROM event WHERE summary LIKE :summary")
-    fun findAllBySummary(summary: String): Flow<List<Event>>
+    fun getAllBySummary(summary: String): List<Event>
 
     @Insert
     suspend fun insertAll(vararg events: Event)

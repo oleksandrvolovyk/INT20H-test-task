@@ -22,11 +22,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.ui.calendar.Calendar
 import the_null_pointer.preppal.ui.grades.Grades
+import the_null_pointer.preppal.ui.new_event.NewEvent
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,10 +55,13 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         startDestination = BottomNavItem.Calendar.screenRoute,
     ) {
         composable(BottomNavItem.Calendar.screenRoute) {
-            Calendar()
+            Calendar(onNewEventButtonClick = { navController.navigate(NavItem.NewEvent.screenRoute) })
         }
         composable(BottomNavItem.Grades.screenRoute) {
             Grades()
+        }
+        composable(NavItem.NewEvent.screenRoute) {
+            NewEvent()
         }
     }
 }
