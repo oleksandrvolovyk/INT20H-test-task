@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import java.time.LocalDateTime
 import java.util.Date
 
 @Entity
@@ -15,7 +16,7 @@ data class Event(
     val summary: String,
 
     @ColumnInfo(name = "type")
-    val type: EventType,
+    val type: Type,
 
     @ColumnInfo(name = "location")
     val location: String?,
@@ -43,7 +44,7 @@ data class Event(
     @ColumnInfo(name = "max_score")
     val maxScore: Double?
 ) {
-    enum class EventType {
+    enum class Type {
         Lecture, Exam, Lab, Practice, Task, Seminar, Workshop
     }
 

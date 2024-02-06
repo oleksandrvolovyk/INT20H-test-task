@@ -4,21 +4,22 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventDAO {
     @Query("SELECT * FROM event")
-    fun getAll(): List<Event>
+    fun getAll(): Flow<List<Event>>
 
     @Query("SELECT * FROM event WHERE id IN (:eventIds)")
-    fun loadAllByIds(eventIds: LongArray): List<Event>
+    fun loadAllByIds(eventIds: LongArray): Flow<List<Event>>
 
     @Query("SELECT * FROM event WHERE summary LIKE :summary")
-    fun findAllBySummary(summary: String): List<Event>
+    fun findAllBySummary(summary: String): Flow<List<Event>>
 
     @Insert
-    fun insertAll(vararg users: Event)
+    suspend fun insertAll(vararg events: Event)
 
     @Delete
-    fun delete(user: Event)
+    suspend fun delete(event: Event)
 }
