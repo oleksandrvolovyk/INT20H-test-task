@@ -1,9 +1,10 @@
 package the_null_pointer.preppal.util
 
 import java.util.Calendar
+import java.util.TimeZone
 
 object TimeUtil {
-    private val calendar: Calendar = Calendar.getInstance()
+    private val calendar: Calendar = Calendar.getInstance().apply { timeZone = TimeZone.getDefault() }
 
     /**
      * Gets hour of day from milliseconds.

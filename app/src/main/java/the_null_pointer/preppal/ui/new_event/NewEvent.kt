@@ -16,6 +16,7 @@ fun NewEvent(viewModel: NewEventViewModel = hiltViewModel()) {
         onSummaryValueChange = { viewModel.updateSummary(it) },
         onEventTypeChange = { viewModel.updateEventType(it) },
         onEventRecurrenceTypeChange = { viewModel.updateRecurrenceType(it) },
+        onRecurrenceEndDateChange = { viewModel.updateRecurrenceEndDate(it) },
         onStartDateChange = { viewModel.updateStartDate(it) },
         onEndDateChange = { viewModel.updateEndDate(it) },
         onReminderStateChange = { viewModel.updateReminderState(it) },

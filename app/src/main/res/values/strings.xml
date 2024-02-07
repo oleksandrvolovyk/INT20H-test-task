@@ -28,4 +28,5 @@
     <string name="reminder">Нагадування</string>
     <string name="add_event_location">Додати місце події</string>
     <string name="is_graded">Оцінюється</string>
+    <string name="repeat_until">Повторювати до</string>
 </resources>

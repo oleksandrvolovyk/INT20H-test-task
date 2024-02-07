@@ -62,6 +62,7 @@ fun NewEventScreen(
     onSummaryValueChange: (String) -> Unit = {},
     onEventTypeChange: (Event.Type) -> Unit = {},
     onEventRecurrenceTypeChange: (Event.RecurrenceType?) -> Unit = {},
+    onRecurrenceEndDateChange: (Long) -> Unit = {},
     onStartDateChange: (Long) -> Unit = {},
     onEndDateChange: (Long) -> Unit = {},
     onReminderStateChange: (Boolean) -> Unit = {},
@@ -229,7 +230,43 @@ fun NewEventScreen(
                 )
             }
 
-            // TODO: Recurrence End date and time picker ("Закінчення повтору")
+            Spacer(modifier = Modifier.height(4.dp))
+
+            if (uiState.recurrenceType != null) {
+                // End of recurrence date picker
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(R.string.repeat_until)
+                    )
+
+                    Row(modifier = Modifier.weight(0.5f), horizontalArrangement = Arrangement.End) {
+                        val endRecurrenceDate =
+                            uiState.recurrenceEnd - uiState.recurrenceEnd % MILLISECONDS_IN_DAY
+
+                        var showEndRecurrenceDatePicker by remember { mutableStateOf(false) }
+
+                        // End date picker
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(onClick = { showEndRecurrenceDatePicker = true }) {
+                                Text(text = endRecurrenceDate.getReadableDate())
+                            }
+                        }
+
+                        if (showEndRecurrenceDatePicker) {
+                            MyDatePickerDialog(
+                                onDateSelected = { newDateMillis ->
+                                    onRecurrenceEndDateChange(newDateMillis)
+                                },
+                                onDismiss = { showEndRecurrenceDatePicker = false }
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
