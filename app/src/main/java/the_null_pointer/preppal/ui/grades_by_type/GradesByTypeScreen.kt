@@ -31,12 +31,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import the_null_pointer.preppal.R
 import androidx.compose.ui.res.painterResource
+import com.google.gson.Gson
 import the_null_pointer.preppal.data.Event
+import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
+import the_null_pointer.preppal.util.TimeUtil.getReadableDate
 
 @Composable
 fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
-                       onGradeClick: () -> Unit = {},
+                       onGradeClick: (String) -> Unit = {},
                        onBackClick: () -> Unit = {}) {
 
 
@@ -67,9 +70,10 @@ fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
                         painter = painterResource(id = R.drawable.ic_arrow_left),
                         contentDescription = "Access Time",
                         tint = Color.Black,
-                        modifier = Modifier.width(50.dp)
+                        modifier = Modifier
+                            .width(50.dp)
                             .align(Alignment.CenterStart)
-                            .clickable {  onBackClick() }// Fill the available space
+                            .clickable { onBackClick() }
                     )
 
             }
@@ -85,7 +89,7 @@ fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
             items(uiState.events, key = { grade -> grade.id })
             { grade ->
 
-                // Змінити умову на перевірку саме чи оцінюване завдання
+                // TODO: Змінити умову на перевірку саме чи оцінюване завдання
 
                 if(!grade.graded){
                     GradeRow(grade, onGradeClick)
@@ -97,7 +101,7 @@ fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
 
 
 @Composable
-fun GradeRow(grade: Event, onGradeClick: () -> Unit = {} ){
+fun GradeRow( grade: Event, onGradeClick: (String) -> Unit = {} ){
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,24 +121,25 @@ fun GradeRow(grade: Event, onGradeClick: () -> Unit = {} ){
                 .fillMaxWidth()
                 .height(70.dp)
 
-                //Add navigation in clickable !->
-
-                .clickable (onClick = onGradeClick)
+                // TODO: Add navigation in clickable !->
+                .clickable {
+                    onGradeClick(Gson().toJson(grade))
+                }
             ,
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
 
             ) {
 
-            Text(text = "${grade.type}\n${grade.summary}",
+            Text(text = "${stringResource(id = grade.type.stringResourceId)}\n${grade.summary}",
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(0.8f))
-            Text(text = grade.end.toString(),
+                    .weight(1.5f))
+            Text(text = "Дедлайн\n" + grade.end.getReadableDate(),
                 modifier = Modifier
                     .padding(4.dp)
                     .weight(0.9f))
-            Text(text = "Оцінка\n${grade.grade}/${grade.maxGrade}",
+            Text(text = "Оцінка\n${grade.grade ?: "-"} / ${grade.maxGrade ?: "-"}",
                 modifier = Modifier
                     .padding(4.dp))
         }

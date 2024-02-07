@@ -5,13 +5,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import the_null_pointer.preppal.data.Event
 
 @Composable
-fun GradesByType(viewModel: GradesByTypeViewModel = hiltViewModel(), onGradeClick: () -> Unit, onBackClick: () -> Unit, type: String ) {
+fun GradesByType(viewModel: GradesByTypeViewModel = hiltViewModel(), onGradeClick: (String) -> Unit, onBackClick: () -> Unit, type: String  ) {
     val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect( key1 = type){
         viewModel.updateType(type)
     }
+
 
     GradesByTypeScreen(uiState = uiState, onGradeClick = onGradeClick, onBackClick = onBackClick)
 }

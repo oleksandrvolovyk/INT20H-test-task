@@ -47,12 +47,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import the_null_pointer.preppal.data.Event
+import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.calendar.CalendarScreen
 import the_null_pointer.preppal.ui.calendar.CalendarScreenUiState
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
 @Composable
-fun GradesScreen( uiState: GradesScreenUiState, onTypeClick: (String) -> Unit = {}) {
+fun GradesScreen(uiState: GradesScreenUiState, onTypeClick: (String) -> Unit = {}) {
 
     val scrollState = rememberScrollState()
     var expanded by remember { mutableStateOf(false) }
@@ -64,109 +65,111 @@ fun GradesScreen( uiState: GradesScreenUiState, onTypeClick: (String) -> Unit = 
                 enabled = true
             )
     ) {
-            Row(modifier = Modifier
-                .fillMaxWidth()) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.scoreBoard),
-                        fontSize = 20.sp,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(6.dp)
-                    )
-
-                    Button(modifier = Modifier
-                        .width(65.dp)
-                        .height(40.dp)
-                        .align(Alignment.TopStart),
-                        onClick = { expanded = true },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        )) {
-                        Text(
-                            "...",
-                            fontSize = 15.sp
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-
-                        // Add Sorting like show ONLY ENGLISH!!
-
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.sorting)) },
-                            onClick = { Log.d("GradesScreen", "${uiState.events}") }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Settings") },
-                            onClick = { /* Handle settings! */ }
-                        )
-
-                    }
-                }
-        }
-
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-            ) {
-                items(uiState.events, key = { grade -> grade.id })
-                { grade ->
-
-                    // Змінити умову на перевірку саме чи оцінюване завдання
-
-                    if(!grade.graded){
-                        GradeRow(grade, onTypeClick)
-                    }
-
-                }
-            }
-
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    stringResource(R.string.progress),
+                    text = stringResource(R.string.scoreBoard),
                     fontSize = 20.sp,
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(6.dp)
                 )
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-            ) {
-                items(uiState.events, key = { grade -> grade.type })
-                { grade ->
-                    ProgressRow(grade)
+
+                Button(
+                    modifier = Modifier
+                        .width(65.dp)
+                        .height(40.dp)
+                        .align(Alignment.TopStart),
+                    onClick = { expanded = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text(
+                        "...",
+                        fontSize = 15.sp
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+
+                    // Add Sorting like show ONLY ENGLISH!!
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sorting)) },
+                        onClick = { Log.d("GradesScreen", "${uiState.events}") }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Settings") },
+                        onClick = { /* Handle settings! */ }
+                    )
                 }
             }
+        }
 
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+        ) {
+            items(uiState.events, key = { grade -> grade.id })
+            { grade ->
+
+                // Змінити умову на перевірку саме чи оцінюване завдання
+
+                if (!grade.graded) {
+                    GradeRow(grade, onTypeClick)
+                }
+
+            }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                stringResource(R.string.progress),
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(6.dp)
+            )
+        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+        ) {
+            items(uiState.events, key = { grade -> grade.type })
+            { grade ->
+                ProgressRow(grade)
+            }
         }
 
     }
 
+}
+
 
 @Composable
-fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {} ){
+fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {}) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
             .clip(shape = RoundedCornerShape(4.dp))
             .padding(6.dp),
-        border =  androidx.compose.foundation.BorderStroke(
+        border = androidx.compose.foundation.BorderStroke(
             width = 3.dp,
             color = colors.secondary
         ),
@@ -181,39 +184,45 @@ fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {} ){
 
                 //Add navigation in clickable !->
 
-                .clickable(onClick = { onTypeClick("${grade.type}") })
-            ,
+                .clickable(onClick = { onTypeClick("${grade.type}") }),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
 
-        ) {
+            ) {
 
-            Text(text = "${grade.type}",
+            Text(
+                text = stringResource(id = grade.type.stringResourceId),
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(0.8f))
-            Text(text = "",
+                    .weight(1.8f)
+            )
+            Text(
+                text = "",
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(0.9f))
-            Icon( painter = painterResource(id = R.drawable.ic_arrow_right),
+                    .weight(0.9f)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_arrow_right),
                 contentDescription = "Access Time",
                 tint = Color.Black,
-                modifier = Modifier.size(48.dp)
-                    .padding(8.dp))
-           }
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(8.dp)
+            )
+        }
     }
 }
 
 @Composable
-fun ProgressRow(grade: Event){
+fun ProgressRow(grade: Event) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
             .clip(shape = RoundedCornerShape(4.dp))
             .padding(6.dp),
-        border =  androidx.compose.foundation.BorderStroke(
+        border = androidx.compose.foundation.BorderStroke(
             width = 3.dp,
             color = colors.secondary
         ),
@@ -224,20 +233,23 @@ fun ProgressRow(grade: Event){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(70.dp)
-                ,
+                .height(70.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
 
-            Text(text = grade.type.toString(),
+            Text(
+                text = stringResource(id = grade.type.stringResourceId),
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(0.8f))
-            Text(text = "Відвідано\n${grade.grade}/${grade.maxGrade}",
+                    .weight(0.8f)
+            )
+            Text(
+                text = "Відвідано\n${grade.grade ?: "-"} / ${grade.maxGrade ?: "-"}",
                 modifier = Modifier
-                    .padding(4.dp))
+                    .padding(4.dp)
+            )
         }
     }
 }

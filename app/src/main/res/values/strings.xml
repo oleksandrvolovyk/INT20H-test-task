@@ -3,6 +3,8 @@
     <string name="scoreBoard">Журнал оцінок</string>
     <string name="progress">Прогрес</string>
     <string name="sorting">Сортувати</string>
+    <string name="get_grade">Отримана оцінка</string>
+    <string name="max_grade">Максимальна оцінка</string>
 
     <string name="add_new_event">Додати подію</string>
     <string name="OK">OK</string>

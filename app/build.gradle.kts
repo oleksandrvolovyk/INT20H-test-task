@@ -92,6 +92,9 @@ dependencies {
     // kotlinx-serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
+    //Gson
+    implementation("com.google.code.gson:gson:2.10.1")
+
     // OpenStreetMap
     implementation("org.osmdroid:osmdroid-android:6.1.18")
 

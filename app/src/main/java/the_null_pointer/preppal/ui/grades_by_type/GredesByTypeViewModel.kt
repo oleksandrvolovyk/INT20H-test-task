@@ -1,5 +1,7 @@
 package the_null_pointer.preppal.ui.grades_by_type
 
+import android.util.Log
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +17,7 @@ import kotlinx.coroutines.launch
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.EventRepository
 import the_null_pointer.preppal.ui.new_event.NewEventScreenUiState
+
 import javax.inject.Inject
 
 data class GradesByTypeScreenUiState(
@@ -22,10 +25,12 @@ data class GradesByTypeScreenUiState(
 )
 
 @HiltViewModel
-class GradesByTypeViewModel @Inject constructor(private val eventRepository: EventRepository): ViewModel() {
+class GradesByTypeViewModel @Inject constructor(private val eventRepository: EventRepository
+    ): ViewModel() {
 
     private val _uiState = MutableStateFlow(GradesByTypeScreenUiState())
     val uiState: StateFlow<GradesByTypeScreenUiState> = _uiState.asStateFlow()
+
 
     fun updateType(type: String) = viewModelScope.launch{
         _uiState.update{

@@ -24,8 +24,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import the_null_pointer.preppal.R
+import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.ui.calendar.Calendar
 import the_null_pointer.preppal.ui.grades.Grades
 import the_null_pointer.preppal.ui.grades_by_type.GradesByType
@@ -73,14 +75,21 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             arguments = listOf(navArgument("type") {type = NavType.StringType })
         ){backStackEntry ->
             backStackEntry?.arguments?.getString("type")?.let{type ->
-                GradesByType(onGradeClick = {navController.navigate(NavItem.GradeChange.screenRoute)},
+
+                GradesByType(onGradeClick = {event -> navController.navigate(NavItem.GradeChange.screenRoute+"/"+event)},
                     onBackClick = {navController.popBackStack()},
                     type = type)
             }
 
         }
-        composable(NavItem.GradeChange.screenRoute) {
-            GradeChange(onBackClicked = {navController.popBackStack()})
+        composable(NavItem.GradeChange.screenRoute+"/{event}",
+            arguments = listOf(navArgument("event") {type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry?.arguments?.getString("event")?.let{json ->
+                val event = Gson().fromJson(json, Event::class.java)
+                GradeChange(event = event, onBackClicked = {navController.popBackStack()})
+            }
+
         }
         composable(
             NavItem.NewEvent.screenRoute + "?startingEpochDay={startingEpochDay}",

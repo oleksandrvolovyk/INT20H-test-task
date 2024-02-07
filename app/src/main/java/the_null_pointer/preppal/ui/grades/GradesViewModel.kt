@@ -18,12 +18,13 @@ import javax.inject.Inject
 data class GradesScreenUiState(
     val events: List<Event> = emptyList(),
 
-)
+    )
 
 @HiltViewModel
-class GradesViewModel @Inject constructor(private val eventRepository: EventRepository): ViewModel() {
+class GradesViewModel @Inject constructor(private val eventRepository: EventRepository) :
+    ViewModel() {
     val uiState: StateFlow<GradesScreenUiState> = eventRepository.observeEvents()
-        .map {   events ->
+        .map { events ->
             val uniqueEventTypes = HashSet<String>()
             val filteredEvents = events.filter { event ->
                 val isUnique = uniqueEventTypes.add(event.type.toString())
