@@ -4,7 +4,7 @@ import java.util.Calendar
 import java.util.TimeZone
 
 object TimeUtil {
-    private val calendar: Calendar = Calendar.getInstance().apply { timeZone = TimeZone.getDefault() }
+    private val calendar: Calendar = Calendar.getInstance().apply { timeZone = TimeZone.getTimeZone("GMT") }
 
     /**
      * Gets hour of day from milliseconds.
