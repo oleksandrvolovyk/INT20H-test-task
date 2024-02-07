@@ -67,18 +67,36 @@ class NewEventViewModel @Inject constructor(
     }
 
     fun updateStartDate(newStartDateMillis: Long) {
-        _uiState.update {
-            it.copy(
-                start = newStartDateMillis
-            )
+        if (newStartDateMillis <= uiState.value.end) {
+            _uiState.update {
+                it.copy(
+                    start = newStartDateMillis
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    start = newStartDateMillis,
+                    end = newStartDateMillis
+                )
+            }
         }
     }
 
     fun updateEndDate(newEndDateMillis: Long) {
-        _uiState.update {
-            it.copy(
-                end = newEndDateMillis
-            )
+        if (newEndDateMillis >= uiState.value.start) {
+            _uiState.update {
+                it.copy(
+                    end = newEndDateMillis
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    start = newEndDateMillis,
+                    end = newEndDateMillis
+                )
+            }
         }
     }
 
