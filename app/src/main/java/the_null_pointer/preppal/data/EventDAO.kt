@@ -14,6 +14,9 @@ interface EventDAO {
     @Query("SELECT * FROM event WHERE id IN (:eventIds)")
     fun getAllByIds(eventIds: LongArray): List<Event>
 
+    @Query("SELECT * FROM event WHERE type = :type")
+    fun getAllByType(type: String): List<Event>
+
     @Query("SELECT * FROM event WHERE summary LIKE :summary")
     fun getAllBySummary(summary: String): List<Event>
 

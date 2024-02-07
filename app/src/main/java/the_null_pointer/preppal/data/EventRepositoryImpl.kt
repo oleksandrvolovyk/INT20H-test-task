@@ -10,6 +10,10 @@ class EventRepositoryImpl(
 ) : EventRepository {
     override fun observeEvents(): Flow<List<Event>> = eventDAO.observeAll()
 
+    override suspend fun getAllByType(type: String): List<Event> = withContext(ioDispatcher){
+        eventDAO.getAllByType(type)
+    }
+
     override suspend fun getAllByIds(eventIds: LongArray): List<Event> = withContext(ioDispatcher) {
         eventDAO.getAllByIds(eventIds)
     }

@@ -18,10 +18,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.ui.calendar.Calendar
@@ -59,15 +61,21 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         composable(BottomNavItem.Calendar.screenRoute) {
             Calendar(onNewEventButtonClick = { navController.navigate(NavItem.NewEvent.screenRoute) })
         }
-        composable(BottomNavItem.Grades.screenRoute) {
-            Grades(onTypeClick = {navController.navigate(NavItem.GradesByType.screenRoute)})
+        composable(BottomNavItem.Grades.screenRoute){
+            Grades(onTypeClick = {type -> navController.navigate(NavItem.GradesByType.screenRoute+"/"+type)})
         }
-        composable(NavItem.GradesByType.screenRoute){
-            GradesByType(onGradeClick = {navController.navigate(NavItem.GradeChange.screenRoute)},
-                         onBackClick = {navController.navigate(BottomNavItem.Grades.screenRoute)})
+        composable(NavItem.GradesByType.screenRoute+"/{type}",
+            arguments = listOf(navArgument("type") {type = NavType.StringType })
+        ){backStackEntry ->
+            backStackEntry?.arguments?.getString("type")?.let{type ->
+                GradesByType(onGradeClick = {navController.navigate(NavItem.GradeChange.screenRoute)},
+                    onBackClick = {navController.popBackStack()},
+                    type = type)
+            }
+
         }
         composable(NavItem.GradeChange.screenRoute) {
-            GradeChange(onBackClicked = {navController.navigate(NavItem.GradesByType.screenRoute)})
+            GradeChange(onBackClicked = {navController.popBackStack()})
         }
         composable(NavItem.NewEvent.screenRoute) {
             NewEvent()
