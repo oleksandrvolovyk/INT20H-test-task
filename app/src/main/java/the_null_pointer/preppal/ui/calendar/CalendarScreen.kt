@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -90,87 +93,93 @@ fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> 
         eventsInSelectedDate = if (date == null) emptyList() else events[date].orEmpty()
     }
 
-    // StatusBarColorUpdateEffect(toolbarColor)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(pageBackgroundColor),
-    ) {
-        val state = rememberCalendarState(
-            startMonth = startMonth,
-            endMonth = endMonth,
-            firstVisibleMonth = currentMonth,
-            firstDayOfWeek = daysOfWeek.first(),
-            outDateStyle = OutDateStyle.EndOfGrid,
-        )
-        val coroutineScope = rememberCoroutineScope()
-        val visibleMonth = rememberFirstCompletelyVisibleMonth(state)
-        LaunchedEffect(visibleMonth) {
-            // Clear selection if we scroll to a new month.
-            selection = null
-        }
-
-        // Draw light content on dark background.
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-            SimpleCalendarTitle(
-                modifier = Modifier
-                    .background(toolbarColor)
-                    .padding(horizontal = 8.dp, vertical = 12.dp),
-                currentMonth = visibleMonth.yearMonth,
-                goToPrevious = {
-                    coroutineScope.launch {
-                        state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
-                    }
-                },
-                goToNext = {
-                    coroutineScope.launch {
-                        state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
-                    }
-                },
-            )
-            HorizontalCalendar(
-                modifier = Modifier.wrapContentWidth(),
-                state = state,
-                dayContent = { day ->
-                    CompositionLocalProvider(LocalRippleTheme provides CalendarRippleTheme) {
-                        val colors = if (day.position == DayPosition.MonthDate) {
-                            events[day.date].orEmpty().map { Color.White } // HARDCODED
-                        } else {
-                            emptyList()
-                        }
-                        Day(
-                            day = day,
-                            isSelected = selection == day,
-                            colors = colors,
-                        ) { clicked ->
-                            selection = clicked
-                        }
-                    }
-                },
-                monthHeader = {
-                    MonthHeader(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        daysOfWeek = daysOfWeek,
-                    )
-                },
-            )
-            Divider(color = pageBackgroundColor)
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(items = eventsInSelectedDate) { event ->
-                    EventInformation(event)
-                }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNewEventButtonClick,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add_new_event),
+                    tint = Color.White
+                )
             }
         }
-
-        FloatingActionButton(
-            onClick = onNewEventButtonClick,
-            modifier = Modifier.padding(8.dp)
+    ) { contentPadding ->
+        Column(
+            modifier = Modifier
+                .padding(contentPadding)
+                .fillMaxSize()
+                .background(pageBackgroundColor)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.End
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = stringResource(id = R.string.add_new_event),
-                tint = Color.White
+            val state = rememberCalendarState(
+                startMonth = startMonth,
+                endMonth = endMonth,
+                firstVisibleMonth = currentMonth,
+                firstDayOfWeek = daysOfWeek.first(),
+                outDateStyle = OutDateStyle.EndOfGrid,
             )
+            val coroutineScope = rememberCoroutineScope()
+            val visibleMonth = rememberFirstCompletelyVisibleMonth(state)
+            LaunchedEffect(visibleMonth) {
+                // Clear selection if we scroll to a new month.
+                selection = null
+            }
+
+            // Draw light content on dark background.
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                SimpleCalendarTitle(
+                    modifier = Modifier
+                        .background(toolbarColor)
+                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                    currentMonth = visibleMonth.yearMonth,
+                    goToPrevious = {
+                        coroutineScope.launch {
+                            state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+                        }
+                    },
+                    goToNext = {
+                        coroutineScope.launch {
+                            state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
+                        }
+                    },
+                )
+                HorizontalCalendar(
+                    modifier = Modifier.wrapContentWidth(),
+                    state = state,
+                    dayContent = { day ->
+                        CompositionLocalProvider(LocalRippleTheme provides CalendarRippleTheme) {
+                            val colors = if (day.position == DayPosition.MonthDate) {
+                                events[day.date].orEmpty().map { Color.White } // HARDCODED
+                            } else {
+                                emptyList()
+                            }
+                            Day(
+                                day = day,
+                                isSelected = selection == day,
+                                colors = colors,
+                            ) { clicked ->
+                                selection = clicked
+                            }
+                        }
+                    },
+                    monthHeader = {
+                        MonthHeader(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            daysOfWeek = daysOfWeek,
+                        )
+                    },
+                )
+                Divider(color = pageBackgroundColor)
+                LazyColumn(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+                    items(items = eventsInSelectedDate) { event ->
+                        EventInformation(event)
+                    }
+                }
+            }
         }
     }
 }
