@@ -27,7 +27,7 @@ interface EventDAO {
     fun insert(vararg events: Event)
 
     @Insert
-    fun insertAll(events: List<Event>)
+    fun insertAll(events: List<Event>): List<Long>
 
     @Delete
     fun delete(event: Event)

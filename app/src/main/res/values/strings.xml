@@ -34,4 +34,9 @@
     <string name="reminder_1_hour">За 1 годину</string>
     <string name="reminder_1_day">За 1 день</string>
     <string name="reminder_1_week">За 1 тиждень</string>
+    <string name="summary_must_not_be_blank">Назва події не може бути пустою!</string>
+    <string name="event_with_summary_and_type_already_exists">Подія з такою назвою та типом вже існує!</string>
+    <string name="start_time_greater_than_end_time">Час початку події не може бути більшим за час кінця!</string>
+    <string name="event_successfully_saved">Подію успішно збережено!</string>
+    <string name="event_failed_to_save">Не вдалось зберегти подію :(</string>
 </resources>

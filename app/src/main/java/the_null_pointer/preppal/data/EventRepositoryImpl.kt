@@ -32,7 +32,7 @@ class EventRepositoryImpl(
     }
 
     override suspend fun insertAll(events: List<Event>) = withContext(ioDispatcher) {
-        eventDAO.insertAll(events)
+        return@withContext eventDAO.insertAll(events).isNotEmpty()
     }
 
     override suspend fun delete(event: Event) {

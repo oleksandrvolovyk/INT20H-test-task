@@ -3,15 +3,20 @@ package the_null_pointer.preppal.ui.new_event
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.EventRepository
 import the_null_pointer.preppal.data.Location
 import the_null_pointer.preppal.data.TimestampMillis
+import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
 import the_null_pointer.preppal.util.TimeUtil.isWeekend
 import the_null_pointer.preppal.util.TimeUtil.isWorkingDay
@@ -41,6 +46,10 @@ class NewEventViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(NewEventScreenUiState())
     val uiState: StateFlow<NewEventScreenUiState> = _uiState.asStateFlow()
+
+    private val _sideEffectChannel = Channel<SideEffect>(capacity = Channel.BUFFERED)
+    val sideEffectFlow: Flow<SideEffect>
+        get() = _sideEffectChannel.receiveAsFlow()
 
     fun updateSummary(newSummary: String) {
         _uiState.update {
@@ -158,7 +167,9 @@ class NewEventViewModel @Inject constructor(
 
         // Verify summary is not blank
         if (currentUiState.summary.isBlank()) {
-            // TODO: Show Toast "Summary must not be empty"
+            _sideEffectChannel.trySend(
+                SideEffect.ShowToast(R.string.summary_must_not_be_blank)
+            )
             return@launch
         }
 
@@ -166,13 +177,17 @@ class NewEventViewModel @Inject constructor(
         if (eventRepository.getAllBySummaryAndType(currentUiState.summary, currentUiState.type)
                 .isNotEmpty()
         ) {
-            // TODO: Show Toast "Summary must be unique"
+            _sideEffectChannel.trySend(
+                SideEffect.ShowToast(R.string.event_with_summary_and_type_already_exists)
+            )
             return@launch
         }
 
         // 2. Verify start <= end
         if (currentUiState.start > currentUiState.end) {
-            // TODO: Show Toast "Starting time must be less or equal to ending time"
+            _sideEffectChannel.trySend(
+                SideEffect.ShowToast(R.string.start_time_greater_than_end_time)
+            )
             return@launch
         }
 
@@ -250,9 +265,18 @@ class NewEventViewModel @Inject constructor(
             events.add(baseEvent)
         }
 
-        eventRepository.insertAll(events)
-
-        // TODO: Navigate back to Calendar
+        if (eventRepository.insertAll(events)) {
+            _sideEffectChannel.trySend(
+                SideEffect.ShowToast(R.string.event_successfully_saved)
+            )
+            _sideEffectChannel.trySend(
+                SideEffect.NavigateBack
+            )
+        } else {
+            _sideEffectChannel.trySend(
+                SideEffect.ShowToast(R.string.event_failed_to_save)
+            )
+        }
     }
 
     /**

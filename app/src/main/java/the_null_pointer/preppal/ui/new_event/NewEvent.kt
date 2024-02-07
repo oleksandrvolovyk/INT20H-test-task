@@ -4,12 +4,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import the_null_pointer.preppal.ui.SideEffect
+import the_null_pointer.preppal.ui.SingleEventEffect
+import the_null_pointer.preppal.ui.handleSideEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewEvent(viewModel: NewEventViewModel = hiltViewModel()) {
+fun NewEvent(viewModel: NewEventViewModel = hiltViewModel(), onNavigateBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     NewEventScreen(
         uiState = uiState,
@@ -26,4 +31,12 @@ fun NewEvent(viewModel: NewEventViewModel = hiltViewModel()) {
         onGradedChange = { viewModel.updateGradedState(it) },
         onSubmitEventButtonClick = { viewModel.submitEvent() }
     )
+
+    SingleEventEffect(sideEffectFlow = viewModel.sideEffectFlow) { sideEffect ->
+        if (!handleSideEffect(context, sideEffect)) {
+            if (sideEffect is SideEffect.NavigateBack) {
+                onNavigateBack()
+            }
+        }
+    }
 }

@@ -78,7 +78,7 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             GradeChange(onBackClicked = {navController.popBackStack()})
         }
         composable(NavItem.NewEvent.screenRoute) {
-            NewEvent()
+            NewEvent(onNavigateBack = { navController.popBackStack() })
         }
 
     }
