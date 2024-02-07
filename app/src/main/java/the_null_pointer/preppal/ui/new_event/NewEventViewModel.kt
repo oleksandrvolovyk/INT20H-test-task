@@ -18,7 +18,7 @@ data class NewEventScreenUiState(
     val summary: String = "",
     val type: Event.Type = Event.Type.Task,
     val recurrenceType: Event.RecurrenceType? = null,
-    val recurrenceEnd: TimestampMillis = System.currentTimeMillis(),
+    val recurrenceEndDate: TimestampMillis = System.currentTimeMillis(),
     val start: TimestampMillis = System.currentTimeMillis(),
     val end: TimestampMillis = System.currentTimeMillis(),
     val isReminderEnabled: Boolean = false,
@@ -61,7 +61,7 @@ class NewEventViewModel @Inject constructor(
     fun updateRecurrenceEndDate(newEndDateMillis: Long) {
         _uiState.update {
             it.copy(
-                recurrenceEnd = newEndDateMillis
+                recurrenceEndDate = newEndDateMillis
             )
         }
     }

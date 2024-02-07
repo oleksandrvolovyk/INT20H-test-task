@@ -3,8 +3,10 @@ package the_null_pointer.preppal.ui.new_event
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -108,111 +110,103 @@ fun NewEventScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Start date & time picker
+            // Start/end date & time picker
+            val startDate = uiState.start - uiState.start % MILLISECONDS_IN_DAY
+            val startHour = uiState.start.getHour()
+            val startMinute = uiState.start.getMinute()
+
+            val endDate = uiState.end - uiState.end % MILLISECONDS_IN_DAY
+            val endHour = uiState.end.getHour()
+            val endMinute = uiState.end.getMinute()
+
+            var showDatePicker by remember { mutableStateOf(false) }
+            var showStartTimePicker by remember { mutableStateOf(false) }
+            var showEndTimePicker by remember { mutableStateOf(false) }
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
             ) {
-                Text(modifier = Modifier.weight(0.2f), text = stringResource(R.string.from))
-
-                Row(modifier = Modifier.weight(0.8f), horizontalArrangement = Arrangement.End) {
-
-                    val startDate = uiState.start - uiState.start % MILLISECONDS_IN_DAY
-                    val startHour = uiState.start.getHour()
-                    val startMinute = uiState.start.getMinute()
-
-                    var showStartDatePicker by remember { mutableStateOf(false) }
-                    var showStartTimePicker by remember { mutableStateOf(false) }
-
-                    // Start date picker
-                    Box(contentAlignment = Alignment.Center) {
-                        Button(onClick = { showStartDatePicker = true }) {
-                            Text(text = startDate.getReadableDate())
-                        }
-                    }
-
-                    if (showStartDatePicker) {
-                        MyDatePickerDialog(
-                            onDateSelected = { newDateMillis ->
-                                onStartDateChange(newDateMillis + startHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
-                            },
-                            onDismiss = { showStartDatePicker = false }
-                        )
-                    }
-
-                    // Start time picker
-                    Box(contentAlignment = Alignment.Center) {
-                        Button(onClick = { showStartTimePicker = true }) {
-                            Text(
-                                text = "${
-                                    startHour.toString().padStart(2, '0')
-                                }:${startMinute.toString().padStart(2, '0')}"
-                            )
-                        }
-                    }
-
-                    if (showStartTimePicker) {
-                        MyTimePickerDialog(
-                            onTimeSelected = { newHour, newMinute ->
-                                onStartDateChange(startDate + newHour * MILLISECONDS_IN_HOUR + newMinute * MILLISECONDS_IN_MINUTE)
-                            },
-                            onDismiss = { showStartTimePicker = false }
-                        )
-                    }
+                Column(
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(text = stringResource(R.string.from))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = stringResource(R.string.to))
                 }
-            }
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // End date & time picker
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(modifier = Modifier.weight(0.2f), text = stringResource(R.string.to))
-
-                Row(modifier = Modifier.weight(0.8f), horizontalArrangement = Arrangement.End) {
-                    val endDate = uiState.end - uiState.end % MILLISECONDS_IN_DAY
-                    val endHour = uiState.end.getHour()
-                    val endMinute = uiState.end.getMinute()
-
-                    var showEndDatePicker by remember { mutableStateOf(false) }
-                    var showEndTimePicker by remember { mutableStateOf(false) }
-
-                    // End date picker
-                    Box(contentAlignment = Alignment.Center) {
-                        Button(onClick = { showEndDatePicker = true }) {
-                            Text(text = endDate.getReadableDate())
+                Row(
+                    modifier = Modifier
+                        .weight(0.8f),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        // Date picker
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(
+                                modifier = Modifier.fillMaxHeight(),
+                                onClick = { showDatePicker = true }
+                            ) {
+                                Text(text = startDate.getReadableDate())
+                            }
                         }
-                    }
 
-                    if (showEndDatePicker) {
-                        MyDatePickerDialog(
-                            onDateSelected = { newDateMillis ->
-                                onEndDateChange(newDateMillis + endHour * MILLISECONDS_IN_HOUR + endMinute * MILLISECONDS_IN_MINUTE)
-                            },
-                            onDismiss = { showEndDatePicker = false }
-                        )
-                    }
-
-                    // End time picker
-                    Box(contentAlignment = Alignment.Center) {
-                        Button(onClick = { showEndTimePicker = true }) {
-                            Text(
-                                text = "${endHour.toString().padStart(2, '0')}:${
-                                    endMinute.toString().padStart(2, '0')
-                                }"
+                        if (showDatePicker) {
+                            MyDatePickerDialog(
+                                onDateSelected = { newDateMillis ->
+                                    onStartDateChange(newDateMillis + startHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
+                                    onEndDateChange(newDateMillis + endHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
+                                },
+                                onDismiss = { showDatePicker = false }
                             )
                         }
                     }
 
-                    if (showEndTimePicker) {
-                        MyTimePickerDialog(
-                            onTimeSelected = { newHour, newMinute ->
-                                onEndDateChange(endDate + newHour * MILLISECONDS_IN_HOUR + newMinute * MILLISECONDS_IN_MINUTE)
-                            },
-                            onDismiss = { showEndTimePicker = false }
-                        )
+                    Column {
+                        // Start time picker
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(onClick = { showStartTimePicker = true }) {
+                                Text(
+                                    text = "${
+                                        startHour.toString().padStart(2, '0')
+                                    }:${startMinute.toString().padStart(2, '0')}"
+                                )
+                            }
+                        }
+
+                        if (showStartTimePicker) {
+                            MyTimePickerDialog(
+                                onTimeSelected = { newHour, newMinute ->
+                                    onStartDateChange(startDate + newHour * MILLISECONDS_IN_HOUR + newMinute * MILLISECONDS_IN_MINUTE)
+                                },
+                                onDismiss = { showStartTimePicker = false }
+                            )
+                        }
+
+                        Spacer(Modifier.height(4.dp))
+
+                        // End time picker
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(onClick = { showEndTimePicker = true }) {
+                                Text(
+                                    text = "${endHour.toString().padStart(2, '0')}:${
+                                        endMinute.toString().padStart(2, '0')
+                                    }"
+                                )
+                            }
+                        }
+
+                        if (showEndTimePicker) {
+                            MyTimePickerDialog(
+                                onTimeSelected = { newHour, newMinute ->
+                                    onEndDateChange(endDate + newHour * MILLISECONDS_IN_HOUR + newMinute * MILLISECONDS_IN_MINUTE)
+                                },
+                                onDismiss = { showEndTimePicker = false }
+                            )
+                        }
                     }
                 }
             }
@@ -252,7 +246,7 @@ fun NewEventScreen(
 
                     Row(modifier = Modifier.weight(0.5f), horizontalArrangement = Arrangement.End) {
                         val endRecurrenceDate =
-                            uiState.recurrenceEnd - uiState.recurrenceEnd % MILLISECONDS_IN_DAY
+                            uiState.recurrenceEndDate - uiState.recurrenceEndDate % MILLISECONDS_IN_DAY
 
                         var showEndRecurrenceDatePicker by remember { mutableStateOf(false) }
 
