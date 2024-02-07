@@ -29,7 +29,6 @@ import the_null_pointer.preppal.ui.grades.Grades
 import the_null_pointer.preppal.ui.new_event.NewEvent
 import the_null_pointer.preppal.ui.set_grade.GradeChange
 import the_null_pointer.preppal.ui.grades_by_type.GradesByType
-import the_null_pointer.preppal.ui.set_grade.GradeChangeScreen
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
 @AndroidEntryPoint
