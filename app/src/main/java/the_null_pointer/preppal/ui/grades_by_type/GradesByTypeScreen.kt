@@ -39,6 +39,7 @@ fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
                        onGradeClick: () -> Unit = {},
                        onBackClick: () -> Unit = {}) {
 
+
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier

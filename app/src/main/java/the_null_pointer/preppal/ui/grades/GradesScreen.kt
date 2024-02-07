@@ -44,13 +44,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.ui.calendar.CalendarScreen
 import the_null_pointer.preppal.ui.calendar.CalendarScreenUiState
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
 @Composable
-fun GradesScreen(uiState: GradesScreenUiState, onTypeClick: () -> Unit = {}) {
+fun GradesScreen( uiState: GradesScreenUiState, onTypeClick: (String) -> Unit = {}) {
 
     val scrollState = rememberScrollState()
     var expanded by remember { mutableStateOf(false) }
@@ -157,7 +159,7 @@ fun GradesScreen(uiState: GradesScreenUiState, onTypeClick: () -> Unit = {}) {
 
 
 @Composable
-fun GradeRow(grade: Event, onTypeClick: () -> Unit = {} ){
+fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {} ){
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -179,7 +181,7 @@ fun GradeRow(grade: Event, onTypeClick: () -> Unit = {} ){
 
                 //Add navigation in clickable !->
 
-                .clickable(onClick = onTypeClick)
+                .clickable(onClick = { onTypeClick("${grade.type}") })
             ,
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
