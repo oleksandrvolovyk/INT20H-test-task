@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import the_null_pointer.preppal.R
 
 @Composable
-fun GradeChangeScreen() {
+fun GradeChangeScreen(onBackClicked: () -> Unit = {}) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -55,7 +55,7 @@ fun GradeChangeScreen() {
                     .width(65.dp)
                     .height(35.dp)
                     .align(Alignment.TopStart),
-                    onClick = {  },
+                    onClick =  onBackClicked,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color.Black
@@ -73,11 +73,15 @@ fun GradeChangeScreen() {
         SimpleText(text = "ДАТА")
         SimpleText(text = "Введіть ващу оцінку")
 
-        val textState = remember { mutableStateOf("") }
+        // Move to ViewModel !!
+
+        val getGradeState = remember { mutableStateOf("") }
+        val maxGradeState = remember { mutableStateOf("") }
+
         Row {
             TextField(
-                value = textState.value,
-                onValueChange = { newText -> textState.value = newText },
+                value = getGradeState.value,
+                onValueChange = { newText -> getGradeState.value = newText },
                 modifier = Modifier.weight(0.5f),
                 label = { Text("Отримана оцінка") } // Optional: Add a label for the text field
             )
@@ -85,8 +89,8 @@ fun GradeChangeScreen() {
             Spacer(modifier = Modifier.width(5.dp))
 
             TextField(
-                value = textState.value,
-                onValueChange = { newText -> textState.value = newText },
+                value = maxGradeState.value,
+                onValueChange = { newText -> maxGradeState.value = newText },
                 modifier = Modifier.weight(0.5f),
                 label = { Text("Максимальна оцінка") } // Optional: Add a label for the text field
             )

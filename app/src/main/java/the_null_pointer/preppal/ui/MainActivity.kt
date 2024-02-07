@@ -27,6 +27,9 @@ import the_null_pointer.preppal.R
 import the_null_pointer.preppal.ui.calendar.Calendar
 import the_null_pointer.preppal.ui.grades.Grades
 import the_null_pointer.preppal.ui.new_event.NewEvent
+import the_null_pointer.preppal.ui.set_grade.GradeChange
+import the_null_pointer.preppal.ui.grades_by_type.GradesByType
+import the_null_pointer.preppal.ui.set_grade.GradeChangeScreen
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
 @AndroidEntryPoint
@@ -58,11 +61,19 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             Calendar(onNewEventButtonClick = { navController.navigate(NavItem.NewEvent.screenRoute) })
         }
         composable(BottomNavItem.Grades.screenRoute) {
-            Grades()
+            Grades(onTypeClick = {navController.navigate(NavItem.GradesByType.screenRoute)})
+        }
+        composable(NavItem.GradesByType.screenRoute){
+            GradesByType(onGradeClick = {navController.navigate(NavItem.GradeChange.screenRoute)},
+                         onBackClick = {navController.navigate(BottomNavItem.Grades.screenRoute)})
+        }
+        composable(NavItem.GradeChange.screenRoute) {
+            GradeChange(onBackClicked = {navController.navigate(NavItem.GradesByType.screenRoute)})
         }
         composable(NavItem.NewEvent.screenRoute) {
             NewEvent()
         }
+
     }
 }
 

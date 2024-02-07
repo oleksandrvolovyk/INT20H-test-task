@@ -4,6 +4,8 @@ import the_null_pointer.preppal.R
 
 sealed class NavItem(var screenRoute: String) {
     object NewEvent : NavItem("new-event")
+    object GradeChange : NavItem("grade-change")
+    object GradesByType: NavItem("grades-by-type")
 }
 
 sealed class BottomNavItem(var title: String, var icon: Int, var screenRoute: String) {
