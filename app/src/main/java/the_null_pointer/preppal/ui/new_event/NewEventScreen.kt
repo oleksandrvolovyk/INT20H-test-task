@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -22,9 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -33,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import the_null_pointer.preppal.R
@@ -46,6 +51,7 @@ import the_null_pointer.preppal.ui.widget.MyTimePickerDialog
 import the_null_pointer.preppal.ui.widget.Spinner
 import the_null_pointer.preppal.util.OpenStreetMapUtil.addMarker
 import the_null_pointer.preppal.util.OpenStreetMapUtil.clearAllMarkers
+import the_null_pointer.preppal.util.OpenStreetMapUtil.toBoundingBox
 import the_null_pointer.preppal.util.OpenStreetMapUtil.ukraineBoundingBox
 import the_null_pointer.preppal.util.TimeUtil.getHour
 import the_null_pointer.preppal.util.TimeUtil.getMinute
@@ -71,6 +77,7 @@ fun NewEventScreen(
     onGradedChange: (Boolean) -> Unit = {},
     onSubmitEventButtonClick: () -> Unit = {}
 ) {
+    var locationConfirmed by rememberSaveable { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -309,53 +316,132 @@ fun NewEventScreen(
             ) {
                 Checkbox(
                     checked = uiState.isLocationEnabled,
-                    onCheckedChange = onLocationStateChange
+                    onCheckedChange = { checked ->
+                        // To let user re-choose location even after confirmation
+                        if (!checked && locationConfirmed) locationConfirmed = false
+                        onLocationStateChange(checked)
+                    }
                 )
 
                 Text(text = stringResource(R.string.add_event_location))
             }
-        }
 
-        // Location MapView
-        if (uiState.isLocationEnabled) {
-            mapEventsReceiver.onLocationChange = onLocationChange
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
+            // Location preview on MapView
+            if (uiState.isLocationEnabled && uiState.locationLatitude != null
+                && uiState.locationLongitude != null && locationConfirmed
             ) {
-                MapView { mapView ->
-                    mapEventsReceiver.mapView = mapView
+                Card(Modifier.size(200.dp)) {
+                    MapView { mapView ->
+                        Configuration.getInstance().userAgentValue =
+                            mapView.context.getString(R.string.app_name)
+                        mapView.setOnTouchListener { _, _ -> true }
+                        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                        mapView.isTilesScaledToDpi = true
 
-                    Configuration.getInstance().userAgentValue =
-                        mapView.context.getString(R.string.app_name)
-                    mapView.setMultiTouchControls(true)
-                    mapView.isTilesScaledToDpi = true
+                        mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
+                            if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
+                                mapView.zoomToBoundingBox(
+                                    GeoPoint(
+                                        uiState.locationLatitude,
+                                        uiState.locationLongitude
+                                    ).toBoundingBox(),
+                                    false
+                                )
 
-                    mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
-                        if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
-                            mapView.zoomToBoundingBox(ukraineBoundingBox, false)
-
-                            if (uiState.locationLatitude != null && uiState.locationLongitude != null) {
                                 mapView.clearAllMarkers()
                                 mapView.addMarker(
                                     latitude = uiState.locationLatitude,
                                     longitude = uiState.locationLongitude,
-                                    text = "${uiState.locationLatitude.toString().take(6)}, " +
+                                    text = "${
+                                        uiState.locationLatitude.toString().take(6)
+                                    }, " +
                                             uiState.locationLongitude.toString().take(6)
+                                )
+                                mapView.controller.animateTo(
+                                    GeoPoint(
+                                        uiState.locationLatitude,
+                                        uiState.locationLongitude
+                                    )
                                 )
                             }
                         }
                     }
-                    if (!mapView.overlays.contains(mapEventsOverlay)) {
-                        mapView.overlays.add(mapEventsOverlay)
-                    }
                 }
+            }
+
+            Button(onClick = onSubmitEventButtonClick) {
+                Text(stringResource(R.string.submit_event))
             }
         }
 
-        Button(onClick = onSubmitEventButtonClick) {
-            Text(stringResource(R.string.submit_event))
+        // Location MapView dialog
+        if (uiState.isLocationEnabled && !locationConfirmed) {
+            mapEventsReceiver.onLocationChange = onLocationChange
+            BasicAlertDialog(
+                onDismissRequest = { onLocationStateChange(false) }
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Card(Modifier.size(300.dp)) {
+                        MapView { mapView ->
+                            mapEventsReceiver.mapView = mapView
+
+                            Configuration.getInstance().userAgentValue =
+                                mapView.context.getString(R.string.app_name)
+                            mapView.setMultiTouchControls(true)
+                            mapView.isTilesScaledToDpi = true
+
+                            mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
+                                if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
+                                    mapView.zoomToBoundingBox(ukraineBoundingBox, false)
+
+                                    if (uiState.locationLatitude != null && uiState.locationLongitude != null && !locationConfirmed) {
+                                        mapView.zoomToBoundingBox(
+                                            GeoPoint(
+                                                uiState.locationLatitude,
+                                                uiState.locationLongitude
+                                            ).toBoundingBox(diff = 0.005),
+                                            false
+                                        )
+                                        mapView.clearAllMarkers()
+                                        mapView.addMarker(
+                                            latitude = uiState.locationLatitude,
+                                            longitude = uiState.locationLongitude,
+                                            text = "${
+                                                uiState.locationLatitude.toString().take(6)
+                                            }, " + uiState.locationLongitude.toString().take(6)
+                                        )
+                                    }
+                                }
+                            }
+                            if (!mapView.overlays.contains(mapEventsOverlay)) {
+                                mapView.overlays.add(mapEventsOverlay)
+                            }
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .shadow(4.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (uiState.locationLatitude != null && uiState.locationLongitude != null) {
+                                Text(
+                                    text = "${uiState.locationLatitude.toString().take(6)}, " +
+                                            uiState.locationLongitude.toString().take(6)
+                                )
+                            }
+
+                            Button(onClick = { locationConfirmed = true }) {
+                                Text(stringResource(R.string.confirm_location))
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

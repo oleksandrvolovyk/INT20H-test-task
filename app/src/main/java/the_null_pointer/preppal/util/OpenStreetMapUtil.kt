@@ -44,4 +44,17 @@ object OpenStreetMapUtil {
     fun MapView.clearAllMarkers() {
         this.overlays.removeAll { it is Marker }
     }
+
+    fun GeoPoint.toBoundingBox(diff: Double = 0.002): BoundingBox {
+        return getBoundingBox(
+            GeoPoint(
+                this.latitude - diff,
+                this.longitude - diff
+            ),
+            GeoPoint(
+                this.latitude + diff,
+                this.longitude + diff
+            )
+        )
+    }
 }
