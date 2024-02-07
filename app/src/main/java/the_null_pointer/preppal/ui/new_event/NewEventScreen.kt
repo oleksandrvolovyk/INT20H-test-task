@@ -58,13 +58,12 @@ import the_null_pointer.preppal.util.OpenStreetMapUtil.addMarker
 import the_null_pointer.preppal.util.OpenStreetMapUtil.clearAllMarkers
 import the_null_pointer.preppal.util.OpenStreetMapUtil.toBoundingBox
 import the_null_pointer.preppal.util.OpenStreetMapUtil.ukraineBoundingBox
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_HOUR
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_MINUTE
 import the_null_pointer.preppal.util.TimeUtil.getHour
 import the_null_pointer.preppal.util.TimeUtil.getMinute
 import the_null_pointer.preppal.util.TimeUtil.getReadableDate
-
-private const val MILLISECONDS_IN_DAY = 86_400_000L
-private const val MILLISECONDS_IN_HOUR = 3_600_000L
-private const val MILLISECONDS_IN_MINUTE = 60_000L
 
 // За 5 хв, за годину, за день, за тиждень
 private val reminders = listOf(
@@ -114,7 +113,7 @@ fun NewEventScreen(
                 value = uiState.summary,
                 onValueChange = onSummaryValueChange,
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
                 singleLine = true

@@ -12,6 +12,9 @@ import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.EventRepository
 import the_null_pointer.preppal.data.Location
 import the_null_pointer.preppal.data.TimestampMillis
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
+import the_null_pointer.preppal.util.TimeUtil.isWeekend
+import the_null_pointer.preppal.util.TimeUtil.isWorkingDay
 import javax.inject.Inject
 
 data class NewEventScreenUiState(
@@ -30,8 +33,6 @@ data class NewEventScreenUiState(
 
     val isGraded: Boolean = false
 )
-
-// TODO: Finish "New Event" screen
 
 @HiltViewModel
 class NewEventViewModel @Inject constructor(
@@ -143,23 +144,154 @@ class NewEventViewModel @Inject constructor(
     }
 
     fun submitEvent() = viewModelScope.launch {
-        val latitude = uiState.value.locationLatitude
-        val longitude = uiState.value.locationLongitude
+        val currentUiState = uiState.value
+
+        val latitude = currentUiState.locationLatitude
+        val longitude = currentUiState.locationLongitude
 
         val location =
-            if (latitude != null && longitude != null) Location(latitude, longitude) else null
+            if (latitude != null && longitude != null && currentUiState.isLocationEnabled) {
+                Location(latitude, longitude)
+            } else {
+                null
+            }
 
-        eventRepository.insert(
-            Event(
-                summary = uiState.value.summary,
-                type = uiState.value.type,
-                location = location,
-                start = uiState.value.start,
-                end = uiState.value.end,
-                recurrence = uiState.value.recurrenceType,
-                reminder = emptyList(), // TODO
-                graded = uiState.value.isGraded
-            )
+        // Verify summary is not blank
+        if (currentUiState.summary.isBlank()) {
+            // TODO: Show Toast "Summary must not be empty"
+            return@launch
+        }
+
+        // Verify summary and type combination is unique
+        if (eventRepository.getAllBySummaryAndType(currentUiState.summary, currentUiState.type)
+                .isNotEmpty()
+        ) {
+            // TODO: Show Toast "Summary must be unique"
+            return@launch
+        }
+
+        // 2. Verify start <= end
+        if (currentUiState.start > currentUiState.end) {
+            // TODO: Show Toast "Starting time must be less or equal to ending time"
+            return@launch
+        }
+
+        // 3. Calculate absolute reminder timestamps using given reminder offsets
+        val reminderTimestamps = currentUiState.reminderOffsets.map { reminderOffsetMillis ->
+            currentUiState.start + reminderOffsetMillis
+        }
+
+        // If Event is recurrent, create n needed events, instead of one
+        val events = arrayListOf<Event>()
+
+        val baseEvent = Event(
+            summary = currentUiState.summary,
+            type = currentUiState.type,
+            location = location,
+            start = currentUiState.start,
+            end = currentUiState.end,
+            recurrence = currentUiState.recurrenceType,
+            reminder = reminderTimestamps,
+            graded = currentUiState.isGraded
         )
+
+        if (currentUiState.recurrenceType != null) {
+            when (currentUiState.recurrenceType) {
+                Event.RecurrenceType.Daily -> {
+                    events.addAll(
+                        generateRecurrentEvents(
+                            baseEvent = baseEvent,
+                            recurrenceEndDayMillis = currentUiState.recurrenceEndDate
+                        )
+                    )
+                }
+
+                Event.RecurrenceType.EveryWorkDay -> {
+                    events.addAll(
+                        generateRecurrentEvents(
+                            baseEvent = baseEvent,
+                            recurrenceEndDayMillis = currentUiState.recurrenceEndDate,
+                            dayCondition = { it.isWorkingDay() }
+                        )
+                    )
+                }
+
+                Event.RecurrenceType.EveryWeekend -> {
+                    events.addAll(
+                        generateRecurrentEvents(
+                            baseEvent = baseEvent,
+                            recurrenceEndDayMillis = currentUiState.recurrenceEndDate,
+                            dayCondition = { it.isWeekend() }
+                        )
+                    )
+                }
+
+                Event.RecurrenceType.Weekly -> {
+                    events.addAll(
+                        generateRecurrentEvents(
+                            baseEvent = baseEvent,
+                            recurrenceEndDayMillis = currentUiState.recurrenceEndDate,
+                            dayStep = 7
+                        )
+                    )
+                }
+
+                Event.RecurrenceType.Monthly -> {
+                    events.addAll(
+                        generateRecurrentEvents(
+                            baseEvent = baseEvent,
+                            recurrenceEndDayMillis = currentUiState.recurrenceEndDate,
+                            dayStep = 30 // TODO: Do something better or remove Monthly
+                        )
+                    )
+                }
+            }
+        } else {
+            events.add(baseEvent)
+        }
+
+        eventRepository.insertAll(events)
+
+        // TODO: Navigate back to Calendar
+    }
+
+    /**
+     * Generate a list of events based of baseEvent's recurrence type and recurrenceEndDayMillis.
+     * @param baseEvent                 Event that will be used in generation.
+     * @param recurrenceEndDayMillis    Day in milliseconds when recurrence ends (inclusive)
+     * @param dayStep                   Number of days to skip until next Event. 1 by default
+     * @param dayCondition              Can be applied to filter events (for example, to create events only on working days)
+     * @return                          Hour of day (24-hour format).
+     */
+    private fun generateRecurrentEvents(
+        baseEvent: Event,
+        recurrenceEndDayMillis: Long,
+        dayStep: Int = 1,
+        dayCondition: ((dayMillis: TimestampMillis) -> Boolean)? = null
+    ): List<Event> {
+        val startDayMillis = baseEvent.start - baseEvent.start % MILLISECONDS_IN_DAY
+
+        val events = arrayListOf<Event>()
+        var currentDayOffsetMillis = 0L
+
+        while (startDayMillis + currentDayOffsetMillis <= recurrenceEndDayMillis) {
+            if (dayCondition?.invoke(startDayMillis + currentDayOffsetMillis) != false) {
+                events.add(
+                    Event(
+                        summary = baseEvent.summary,
+                        type = baseEvent.type,
+                        location = baseEvent.location,
+                        start = baseEvent.start + currentDayOffsetMillis,
+                        end = baseEvent.end + currentDayOffsetMillis,
+                        recurrence = baseEvent.recurrence,
+                        reminder = baseEvent.reminder,
+                        graded = baseEvent.graded
+                    )
+                )
+            }
+            currentDayOffsetMillis += dayStep * MILLISECONDS_IN_DAY
+        }
+
+        return events
     }
 }

@@ -20,9 +20,15 @@ interface EventDAO {
     @Query("SELECT * FROM event WHERE summary LIKE :summary")
     fun getAllBySummary(summary: String): List<Event>
 
+    @Query("SELECT * FROM event WHERE summary = :summary AND type = :type")
+    fun getAllBySummaryAndType(summary: String, type: Event.Type): List<Event>
+
     @Insert
-    suspend fun insertAll(vararg events: Event)
+    fun insert(vararg events: Event)
+
+    @Insert
+    fun insertAll(events: List<Event>)
 
     @Delete
-    suspend fun delete(event: Event)
+    fun delete(event: Event)
 }

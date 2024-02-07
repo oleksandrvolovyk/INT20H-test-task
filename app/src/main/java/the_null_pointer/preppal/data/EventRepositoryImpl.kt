@@ -10,7 +10,7 @@ class EventRepositoryImpl(
 ) : EventRepository {
     override fun observeEvents(): Flow<List<Event>> = eventDAO.observeAll()
 
-    override suspend fun getAllByType(type: String): List<Event> = withContext(ioDispatcher){
+    override suspend fun getAllByType(type: String): List<Event> = withContext(ioDispatcher) {
         eventDAO.getAllByType(type)
     }
 
@@ -22,8 +22,17 @@ class EventRepositoryImpl(
         eventDAO.getAllBySummary(summary)
     }
 
+    override suspend fun getAllBySummaryAndType(summary: String, type: Event.Type): List<Event> =
+        withContext(ioDispatcher) {
+            eventDAO.getAllBySummaryAndType(summary, type)
+        }
+
     override suspend fun insert(vararg events: Event) = withContext(ioDispatcher) {
-        eventDAO.insertAll(*events)
+        eventDAO.insert(*events)
+    }
+
+    override suspend fun insertAll(events: List<Event>) = withContext(ioDispatcher) {
+        eventDAO.insertAll(events)
     }
 
     override suspend fun delete(event: Event) {
