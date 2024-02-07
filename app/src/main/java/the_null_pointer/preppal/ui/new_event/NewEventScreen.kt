@@ -169,6 +169,7 @@ fun NewEventScreen(
 
                         if (showDatePicker) {
                             MyDatePickerDialog(
+                                initialSelectedDateMillis = startDate,
                                 onDateSelected = { newDateMillis ->
                                     onStartDateChange(newDateMillis + startHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
                                     onEndDateChange(newDateMillis + endHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
@@ -247,7 +248,7 @@ fun NewEventScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             if (uiState.recurrenceType != null) {
-                // End of recurrence date picker
+                // Recurrence End date picker
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -263,7 +264,6 @@ fun NewEventScreen(
 
                         var showEndRecurrenceDatePicker by remember { mutableStateOf(false) }
 
-                        // End date picker
                         Box(contentAlignment = Alignment.Center) {
                             Button(onClick = { showEndRecurrenceDatePicker = true }) {
                                 Text(text = endRecurrenceDate.getReadableDate())
@@ -272,10 +272,14 @@ fun NewEventScreen(
 
                         if (showEndRecurrenceDatePicker) {
                             MyDatePickerDialog(
+                                initialSelectedDateMillis = endRecurrenceDate,
                                 onDateSelected = { newDateMillis ->
                                     onRecurrenceEndDateChange(newDateMillis)
                                 },
-                                onDismiss = { showEndRecurrenceDatePicker = false }
+                                onDismiss = { showEndRecurrenceDatePicker = false },
+                                isSelectableDate = { utcTimeMillis ->
+                                    utcTimeMillis >= uiState.start
+                                }
                             )
                         }
                     }

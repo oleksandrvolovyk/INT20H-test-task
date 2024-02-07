@@ -15,14 +15,17 @@ import the_null_pointer.preppal.R
 @Composable
 fun MyDatePickerDialog(
     onDateSelected: (Long) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    initialSelectedDateMillis: Long? = null,
+    isSelectableDate: (utcTimeMillis: Long) -> Boolean = { true }
 ) {
-    val datePickerState = rememberDatePickerState(selectableDates = object : SelectableDates {
-        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-            return true
-//            return utcTimeMillis <= System.currentTimeMillis()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialSelectedDateMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                isSelectableDate(utcTimeMillis)
         }
-    })
+    )
 
     val selectedDate = datePickerState.selectedDateMillis
 

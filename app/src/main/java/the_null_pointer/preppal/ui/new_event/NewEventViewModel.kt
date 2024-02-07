@@ -109,6 +109,16 @@ class NewEventViewModel @Inject constructor(
                 )
             }
         }
+
+        // If new start date is larger than current recurrence end date, move the recurrence end to
+        // make sure that startDate is always <= recurrenceEndDate
+        if (newStartDateMillis > uiState.value.recurrenceEndDate) {
+            _uiState.update {
+                it.copy(
+                    recurrenceEndDate = newStartDateMillis
+                )
+            }
+        }
     }
 
     fun updateEndDate(newEndDateMillis: Long) {
