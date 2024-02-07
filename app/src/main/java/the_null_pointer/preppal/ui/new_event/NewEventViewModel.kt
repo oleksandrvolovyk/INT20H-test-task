@@ -210,17 +210,12 @@ class NewEventViewModel @Inject constructor(
             return@launch
         }
 
-        // 2. Verify start <= end
+        // Verify start <= end
         if (currentUiState.start > currentUiState.end) {
             _sideEffectChannel.trySend(
                 SideEffect.ShowToast(R.string.start_time_greater_than_end_time)
             )
             return@launch
-        }
-
-        // 3. Calculate absolute reminder timestamps using given reminder offsets
-        val reminderTimestamps = currentUiState.reminderOffsets.map { reminderOffsetMillis ->
-            currentUiState.start + reminderOffsetMillis
         }
 
         // If Event is recurrent, create n needed events, instead of one
@@ -233,7 +228,7 @@ class NewEventViewModel @Inject constructor(
             start = currentUiState.start,
             end = currentUiState.end,
             recurrence = currentUiState.recurrenceType,
-            reminder = reminderTimestamps,
+            reminder = emptyList(),
             graded = currentUiState.isGraded
         )
 
@@ -292,7 +287,15 @@ class NewEventViewModel @Inject constructor(
             events.add(baseEvent)
         }
 
-        if (eventRepository.insertAll(events)) {
+        val eventsWithReminders = events.map { event ->
+            event.copy(
+                reminder = currentUiState.reminderOffsets.map { reminderOffsetMillis ->
+                    event.start + reminderOffsetMillis
+                }
+            )
+        }
+
+        if (eventRepository.insertAll(eventsWithReminders)) {
             _sideEffectChannel.trySend(
                 SideEffect.ShowToast(R.string.event_successfully_saved)
             )
