@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,8 +47,10 @@ import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.Event.RecurrenceType.Companion.stringResourceId
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
+import the_null_pointer.preppal.data.TimestampMillis
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.ui.widget.MapView
+import the_null_pointer.preppal.ui.widget.MultiChoiceSpinner
 import the_null_pointer.preppal.ui.widget.MyDatePickerDialog
 import the_null_pointer.preppal.ui.widget.MyTimePickerDialog
 import the_null_pointer.preppal.ui.widget.Spinner
@@ -59,9 +62,17 @@ import the_null_pointer.preppal.util.TimeUtil.getHour
 import the_null_pointer.preppal.util.TimeUtil.getMinute
 import the_null_pointer.preppal.util.TimeUtil.getReadableDate
 
-private const val MILLISECONDS_IN_DAY = 86_400_000
-private const val MILLISECONDS_IN_HOUR = 3_600_000
-private const val MILLISECONDS_IN_MINUTE = 60_000
+private const val MILLISECONDS_IN_DAY = 86_400_000L
+private const val MILLISECONDS_IN_HOUR = 3_600_000L
+private const val MILLISECONDS_IN_MINUTE = 60_000L
+
+// За 5 хв, за годину, за день, за тиждень
+private val reminders = listOf(
+    (-5 * MILLISECONDS_IN_MINUTE) to R.string.reminder_5_minutes,
+    (-1 * MILLISECONDS_IN_HOUR) to R.string.reminder_1_hour,
+    (-1 * MILLISECONDS_IN_DAY) to R.string.reminder_1_day,
+    (-7 * MILLISECONDS_IN_DAY) to R.string.reminder_1_week,
+)
 
 @ExperimentalMaterial3Api
 @Composable
@@ -74,6 +85,7 @@ fun NewEventScreen(
     onStartDateChange: (Long) -> Unit = {},
     onEndDateChange: (Long) -> Unit = {},
     onReminderStateChange: (Boolean) -> Unit = {},
+    onReminderOffsetsChange: (List<TimestampMillis>) -> Unit = {},
     onLocationStateChange: (Boolean) -> Unit = {},
     onLocationChange: (Double, Double) -> Unit = { _, _ -> },
     onGradedChange: (Boolean) -> Unit = {},
@@ -124,7 +136,9 @@ fun NewEventScreen(
             var showEndTimePicker by remember { mutableStateOf(false) }
 
             Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
             ) {
                 Column(
                     modifier = Modifier
@@ -271,20 +285,35 @@ fun NewEventScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Reminder Checkbox
+            // Reminders
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Checkbox(
-                    checked = uiState.isReminderEnabled,
-                    onCheckedChange = onReminderStateChange
-                )
+                // Reminder Checkbox
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = uiState.isReminderEnabled,
+                        onCheckedChange = onReminderStateChange
+                    )
 
-                Text(text = stringResource(R.string.reminder))
+                    Text(text = stringResource(R.string.reminder))
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                // Reminders multi-choice Spinner
+                if (uiState.isReminderEnabled) {
+                    MultiChoiceSpinner(
+                        modifier = Modifier.fillMaxWidth(),
+                        items = reminders.map { it.first to stringResource(it.second) },
+                        selected = uiState.reminderOffsets,
+                        onSelectionChanged = onReminderOffsetsChange
+                    )
+                }
             }
-
-            // TODO: Reminder Spinner
 
             Spacer(modifier = Modifier.height(4.dp))
 

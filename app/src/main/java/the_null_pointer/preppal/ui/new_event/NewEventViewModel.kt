@@ -22,6 +22,7 @@ data class NewEventScreenUiState(
     val start: TimestampMillis = System.currentTimeMillis(),
     val end: TimestampMillis = System.currentTimeMillis(),
     val isReminderEnabled: Boolean = false,
+    val reminderOffsets: List<TimestampMillis> = emptyList(),
 
     val isLocationEnabled: Boolean = false,
     val locationLatitude: Double? = null,
@@ -104,6 +105,14 @@ class NewEventViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isReminderEnabled = newReminderState
+            )
+        }
+    }
+
+    fun updateReminders(newReminderOffsets: List<TimestampMillis>) {
+        _uiState.update {
+            it.copy(
+                reminderOffsets = newReminderOffsets.sortedDescending()
             )
         }
     }

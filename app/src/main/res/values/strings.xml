@@ -30,4 +30,8 @@
     <string name="is_graded">Оцінюється</string>
     <string name="repeat_until">Повторювати до</string>
     <string name="confirm_location">Підтвердити вибір місця</string>
+    <string name="reminder_5_minutes">За 5 хвилин</string>
+    <string name="reminder_1_hour">За 1 годину</string>
+    <string name="reminder_1_day">За 1 день</string>
+    <string name="reminder_1_week">За 1 тиждень</string>
 </resources>

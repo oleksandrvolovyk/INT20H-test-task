@@ -20,6 +20,7 @@ fun NewEvent(viewModel: NewEventViewModel = hiltViewModel()) {
         onStartDateChange = { viewModel.updateStartDate(it) },
         onEndDateChange = { viewModel.updateEndDate(it) },
         onReminderStateChange = { viewModel.updateReminderState(it) },
+        onReminderOffsetsChange = { viewModel.updateReminders(it) },
         onLocationStateChange = { viewModel.updateLocationState(it) },
         onLocationChange = { latitude, longitude -> viewModel.updateLocation(latitude, longitude) },
         onGradedChange = { viewModel.updateGradedState(it) },
