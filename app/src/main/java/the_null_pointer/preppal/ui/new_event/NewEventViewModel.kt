@@ -1,5 +1,6 @@
 package the_null_pointer.preppal.ui.new_event
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,7 @@ import the_null_pointer.preppal.data.Location
 import the_null_pointer.preppal.data.TimestampMillis
 import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_HOUR
 import the_null_pointer.preppal.util.TimeUtil.isWeekend
 import the_null_pointer.preppal.util.TimeUtil.isWorkingDay
 import javax.inject.Inject
@@ -41,10 +43,25 @@ data class NewEventScreenUiState(
 
 @HiltViewModel
 class NewEventViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val eventRepository: EventRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NewEventScreenUiState())
+    private val startingEpochDay = savedStateHandle.get<Long>("startingEpochDay")
+    private val startingTimestampMillis = if (startingEpochDay != null) {
+        // Day in millis + Hour and minutes in millis
+        startingEpochDay * MILLISECONDS_IN_DAY + System.currentTimeMillis() % MILLISECONDS_IN_DAY
+    } else {
+        System.currentTimeMillis()
+    }
+
+    private val _uiState = MutableStateFlow(
+        NewEventScreenUiState(
+            start = startingTimestampMillis,
+            end = startingTimestampMillis + MILLISECONDS_IN_HOUR,
+            recurrenceEndDate = startingTimestampMillis
+        )
+    )
     val uiState: StateFlow<NewEventScreenUiState> = _uiState.asStateFlow()
 
     private val _sideEffectChannel = Channel<SideEffect>(capacity = Channel.BUFFERED)

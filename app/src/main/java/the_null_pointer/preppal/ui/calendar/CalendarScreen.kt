@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.ripple.LocalRippleTheme
@@ -30,6 +29,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -76,7 +76,10 @@ private val inActiveTextColor: Color @Composable get() = MaterialTheme.colorSche
 private const val MILLISECONDS_IN_DAY = 86_400_000
 
 @Composable
-fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> Unit = {}) {
+fun CalendarScreen(
+    uiState: CalendarScreenUiState,
+    onNewEventButtonClick: (selectedEpochDay: Long?) -> Unit = {}
+) {
     val events = uiState.events
         .sortedBy { it.start }
         .groupBy { LocalDate.ofEpochDay(it.start / MILLISECONDS_IN_DAY) }
@@ -96,7 +99,7 @@ fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onNewEventButtonClick,
+                onClick = { onNewEventButtonClick(selection?.date?.toEpochDay()) },
                 modifier = Modifier.padding(8.dp)
             ) {
                 Icon(
@@ -174,7 +177,9 @@ fun CalendarScreen(uiState: CalendarScreenUiState, onNewEventButtonClick: () -> 
                     },
                 )
                 Divider(color = pageBackgroundColor)
-                LazyColumn(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+                LazyColumn(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)) {
                     items(items = eventsInSelectedDate) { event ->
                         EventInformation(event)
                     }

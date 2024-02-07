@@ -28,10 +28,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.ui.calendar.Calendar
 import the_null_pointer.preppal.ui.grades.Grades
+import the_null_pointer.preppal.ui.grades_by_type.GradesByType
 import the_null_pointer.preppal.ui.new_event.NewEvent
 import the_null_pointer.preppal.ui.set_grade.GradeChange
-import the_null_pointer.preppal.ui.grades_by_type.GradesByType
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -59,7 +60,11 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         startDestination = BottomNavItem.Calendar.screenRoute,
     ) {
         composable(BottomNavItem.Calendar.screenRoute) {
-            Calendar(onNewEventButtonClick = { navController.navigate(NavItem.NewEvent.screenRoute) })
+            Calendar(
+                onNewEventButtonClick = {
+                    navController.navigate(NavItem.NewEvent.screenRoute + "?startingEpochDay=$it")
+                }
+            )
         }
         composable(BottomNavItem.Grades.screenRoute){
             Grades(onTypeClick = {type -> navController.navigate(NavItem.GradesByType.screenRoute+"/"+type)})
@@ -77,7 +82,13 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         composable(NavItem.GradeChange.screenRoute) {
             GradeChange(onBackClicked = {navController.popBackStack()})
         }
-        composable(NavItem.NewEvent.screenRoute) {
+        composable(
+            NavItem.NewEvent.screenRoute + "?startingEpochDay={startingEpochDay}",
+            arguments = listOf(navArgument("startingEpochDay") {
+                type = NavType.LongType
+                defaultValue = System.currentTimeMillis() / MILLISECONDS_IN_DAY
+            })
+        ) {
             NewEvent(onNavigateBack = { navController.popBackStack() })
         }
 
