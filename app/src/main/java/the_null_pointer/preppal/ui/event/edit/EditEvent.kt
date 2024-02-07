@@ -1,6 +1,5 @@
-package the_null_pointer.preppal.ui.new_event
+package the_null_pointer.preppal.ui.event.edit
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -10,13 +9,15 @@ import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.ui.SingleEventEffect
 import the_null_pointer.preppal.ui.handleSideEffect
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewEvent(viewModel: NewEventViewModel = hiltViewModel(), onNavigateBack: () -> Unit) {
+fun EditEvent(
+    viewModel: EditEventViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    NewEventScreen(
+    EditEventScreen(
         uiState = uiState,
         onSummaryValueChange = { viewModel.updateSummary(it) },
         onEventTypeChange = { viewModel.updateEventType(it) },
@@ -29,7 +30,8 @@ fun NewEvent(viewModel: NewEventViewModel = hiltViewModel(), onNavigateBack: () 
         onLocationStateChange = { viewModel.updateLocationState(it) },
         onLocationChange = { latitude, longitude -> viewModel.updateLocation(latitude, longitude) },
         onGradedChange = { viewModel.updateGradedState(it) },
-        onSubmitEventButtonClick = { viewModel.submitEvent() }
+        onSubmitEventButtonClick = { viewModel.submitEvent() },
+        onDeleteEventButtonClick = { viewModel.deleteEvent(it) }
     )
 
     SingleEventEffect(sideEffectFlow = viewModel.sideEffectFlow) { sideEffect ->

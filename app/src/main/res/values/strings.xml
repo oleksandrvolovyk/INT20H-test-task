@@ -41,4 +41,13 @@
     <string name="start_time_greater_than_end_time">Час початку події не може бути більшим за час кінця!</string>
     <string name="event_successfully_saved">Подію успішно збережено!</string>
     <string name="event_failed_to_save">Не вдалось зберегти подію :(</string>
+    <string name="edit_event">Редагувати подію</string>
+    <string name="delete_one_event">Видалити цю подію</string>
+    <string name="delete_one_and_following_events">Видалити цю та майбутні події</string>
+    <string name="delete_all_events">Видалитти всі події</string>
+    <string name="delete">Видалити</string>
+    <string name="deletion">Видалення</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="confirm_event_deletion">Видалити подію(-ї)?</string>
 </resources>

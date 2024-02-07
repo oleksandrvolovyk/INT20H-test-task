@@ -1,4 +1,4 @@
-package the_null_pointer.preppal.ui.new_event
+package the_null_pointer.preppal.ui.event.add_new
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -18,6 +18,7 @@ import the_null_pointer.preppal.data.EventRepository
 import the_null_pointer.preppal.data.Location
 import the_null_pointer.preppal.data.TimestampMillis
 import the_null_pointer.preppal.ui.SideEffect
+import the_null_pointer.preppal.ui.event.BaseEventScreenUiState
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_HOUR
 import the_null_pointer.preppal.util.TimeUtil.isWeekend
@@ -25,21 +26,21 @@ import the_null_pointer.preppal.util.TimeUtil.isWorkingDay
 import javax.inject.Inject
 
 data class NewEventScreenUiState(
-    val summary: String = "",
-    val type: Event.Type = Event.Type.Task,
-    val recurrenceType: Event.RecurrenceType? = null,
-    val recurrenceEndDate: TimestampMillis = System.currentTimeMillis(),
-    val start: TimestampMillis = System.currentTimeMillis(),
-    val end: TimestampMillis = System.currentTimeMillis(),
-    val isReminderEnabled: Boolean = false,
-    val reminderOffsets: List<TimestampMillis> = emptyList(),
+    override val summary: String = "",
+    override val type: Event.Type = Event.Type.Task,
+    override val recurrenceType: Event.RecurrenceType? = null,
+    override val recurrenceEndDate: TimestampMillis = System.currentTimeMillis(),
+    override val start: TimestampMillis = System.currentTimeMillis(),
+    override val end: TimestampMillis = System.currentTimeMillis(),
+    override val isReminderEnabled: Boolean = false,
+    override val reminderOffsets: List<TimestampMillis> = emptyList(),
 
-    val isLocationEnabled: Boolean = false,
-    val locationLatitude: Double? = null,
-    val locationLongitude: Double? = null,
+    override val isLocationEnabled: Boolean = false,
+    override val locationLatitude: Double? = null,
+    override val locationLongitude: Double? = null,
 
-    val isGraded: Boolean = false
-)
+    override val isGraded: Boolean = false
+): BaseEventScreenUiState
 
 @HiltViewModel
 class NewEventViewModel @Inject constructor(

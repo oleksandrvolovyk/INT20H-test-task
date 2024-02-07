@@ -78,7 +78,8 @@ private const val MILLISECONDS_IN_DAY = 86_400_000
 @Composable
 fun CalendarScreen(
     uiState: CalendarScreenUiState,
-    onNewEventButtonClick: (selectedEpochDay: Long?) -> Unit = {}
+    onNewEventButtonClick: (selectedEpochDay: Long?) -> Unit = {},
+    onEventClick: (eventId: Long) -> Unit = {}
 ) {
     val events = uiState.events
         .sortedBy { it.start }
@@ -177,11 +178,16 @@ fun CalendarScreen(
                     },
                 )
                 Divider(color = pageBackgroundColor)
-                LazyColumn(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                ) {
                     items(items = eventsInSelectedDate) { event ->
-                        EventInformation(event)
+                        EventInformation(
+                            modifier = Modifier.clickable { onEventClick(event.id) },
+                            event = event
+                        )
                     }
                 }
             }
@@ -262,9 +268,9 @@ private fun MonthHeader(
 }
 
 @Composable
-private fun LazyItemScope.EventInformation(event: Event) {
+private fun LazyItemScope.EventInformation(event: Event, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillParentMaxWidth()
             .height(IntrinsicSize.Max),
         horizontalArrangement = Arrangement.spacedBy(2.dp),

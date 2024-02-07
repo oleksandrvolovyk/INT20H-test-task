@@ -1,4 +1,4 @@
-package the_null_pointer.preppal.ui.new_event
+package the_null_pointer.preppal.ui.event
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,7 +32,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -48,35 +44,49 @@ import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.Event.RecurrenceType.Companion.stringResourceId
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.data.TimestampMillis
-import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.ui.widget.MapView
 import the_null_pointer.preppal.ui.widget.MultiChoiceSpinner
 import the_null_pointer.preppal.ui.widget.MyDatePickerDialog
 import the_null_pointer.preppal.ui.widget.MyTimePickerDialog
 import the_null_pointer.preppal.ui.widget.Spinner
+import the_null_pointer.preppal.util.OpenStreetMapUtil
 import the_null_pointer.preppal.util.OpenStreetMapUtil.addMarker
 import the_null_pointer.preppal.util.OpenStreetMapUtil.clearAllMarkers
 import the_null_pointer.preppal.util.OpenStreetMapUtil.toBoundingBox
-import the_null_pointer.preppal.util.OpenStreetMapUtil.ukraineBoundingBox
-import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
-import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_HOUR
-import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_MINUTE
+import the_null_pointer.preppal.util.TimeUtil
 import the_null_pointer.preppal.util.TimeUtil.getHour
 import the_null_pointer.preppal.util.TimeUtil.getMinute
 import the_null_pointer.preppal.util.TimeUtil.getReadableDate
 
 // За 5 хв, за годину, за день, за тиждень
-private val reminders = listOf(
-    (-5 * MILLISECONDS_IN_MINUTE) to R.string.reminder_5_minutes,
-    (-1 * MILLISECONDS_IN_HOUR) to R.string.reminder_1_hour,
-    (-1 * MILLISECONDS_IN_DAY) to R.string.reminder_1_day,
-    (-7 * MILLISECONDS_IN_DAY) to R.string.reminder_1_week,
+val reminders = listOf(
+    (-5 * TimeUtil.MILLISECONDS_IN_MINUTE) to R.string.reminder_5_minutes,
+    (-1 * TimeUtil.MILLISECONDS_IN_HOUR) to R.string.reminder_1_hour,
+    (-1 * TimeUtil.MILLISECONDS_IN_DAY) to R.string.reminder_1_day,
+    (-7 * TimeUtil.MILLISECONDS_IN_DAY) to R.string.reminder_1_week,
 )
 
-@ExperimentalMaterial3Api
+interface BaseEventScreenUiState {
+    val summary: String
+    val type: Event.Type
+    val recurrenceType: Event.RecurrenceType?
+    val recurrenceEndDate: TimestampMillis
+    val start: TimestampMillis
+    val end: TimestampMillis
+    val isReminderEnabled: Boolean
+    val reminderOffsets: List<TimestampMillis>
+
+    val isLocationEnabled: Boolean
+    val locationLatitude: Double?
+    val locationLongitude: Double?
+
+    val isGraded: Boolean
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewEventScreen(
-    uiState: NewEventScreenUiState,
+fun BaseEventScreen(
+    uiState: BaseEventScreenUiState,
     onSummaryValueChange: (String) -> Unit = {},
     onEventTypeChange: (Event.Type) -> Unit = {},
     onEventRecurrenceTypeChange: (Event.RecurrenceType?) -> Unit = {},
@@ -88,14 +98,13 @@ fun NewEventScreen(
     onLocationStateChange: (Boolean) -> Unit = {},
     onLocationChange: (Double, Double) -> Unit = { _, _ -> },
     onGradedChange: (Boolean) -> Unit = {},
-    onSubmitEventButtonClick: () -> Unit = {}
+    defaultLocationConfirmState: Boolean = false
 ) {
-    var locationConfirmed by rememberSaveable { mutableStateOf(false) }
-    Column(modifier = Modifier.fillMaxSize()) {
+    var locationConfirmed by rememberSaveable { mutableStateOf(defaultLocationConfirmState) }
+    Column(Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .padding(4.dp)
-                .verticalScroll(rememberScrollState())
         ) {
             // Event Type
             Spinner(
@@ -122,11 +131,11 @@ fun NewEventScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             // Start/end date & time picker
-            val startDate = uiState.start - uiState.start % MILLISECONDS_IN_DAY
+            val startDate = uiState.start - uiState.start % TimeUtil.MILLISECONDS_IN_DAY
             val startHour = uiState.start.getHour()
             val startMinute = uiState.start.getMinute()
 
-            val endDate = uiState.end - uiState.end % MILLISECONDS_IN_DAY
+            val endDate = uiState.end - uiState.end % TimeUtil.MILLISECONDS_IN_DAY
             val endHour = uiState.end.getHour()
             val endMinute = uiState.end.getMinute()
 
@@ -171,8 +180,8 @@ fun NewEventScreen(
                             MyDatePickerDialog(
                                 initialSelectedDateMillis = startDate,
                                 onDateSelected = { newDateMillis ->
-                                    onStartDateChange(newDateMillis + startHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
-                                    onEndDateChange(newDateMillis + endHour * MILLISECONDS_IN_HOUR + startMinute * MILLISECONDS_IN_MINUTE)
+                                    onStartDateChange(newDateMillis + startHour * TimeUtil.MILLISECONDS_IN_HOUR + startMinute * TimeUtil.MILLISECONDS_IN_MINUTE)
+                                    onEndDateChange(newDateMillis + endHour * TimeUtil.MILLISECONDS_IN_HOUR + startMinute * TimeUtil.MILLISECONDS_IN_MINUTE)
                                 },
                                 onDismiss = { showDatePicker = false }
                             )
@@ -194,7 +203,7 @@ fun NewEventScreen(
                         if (showStartTimePicker) {
                             MyTimePickerDialog(
                                 onTimeSelected = { newHour, newMinute ->
-                                    onStartDateChange(startDate + newHour * MILLISECONDS_IN_HOUR + newMinute * MILLISECONDS_IN_MINUTE)
+                                    onStartDateChange(startDate + newHour * TimeUtil.MILLISECONDS_IN_HOUR + newMinute * TimeUtil.MILLISECONDS_IN_MINUTE)
                                 },
                                 onDismiss = { showStartTimePicker = false }
                             )
@@ -216,7 +225,7 @@ fun NewEventScreen(
                         if (showEndTimePicker) {
                             MyTimePickerDialog(
                                 onTimeSelected = { newHour, newMinute ->
-                                    onEndDateChange(endDate + newHour * MILLISECONDS_IN_HOUR + newMinute * MILLISECONDS_IN_MINUTE)
+                                    onEndDateChange(endDate + newHour * TimeUtil.MILLISECONDS_IN_HOUR + newMinute * TimeUtil.MILLISECONDS_IN_MINUTE)
                                 },
                                 onDismiss = { showEndTimePicker = false }
                             )
@@ -260,7 +269,7 @@ fun NewEventScreen(
 
                     Row(modifier = Modifier.weight(0.5f), horizontalArrangement = Arrangement.End) {
                         val endRecurrenceDate =
-                            uiState.recurrenceEndDate - uiState.recurrenceEndDate % MILLISECONDS_IN_DAY
+                            uiState.recurrenceEndDate - uiState.recurrenceEndDate % TimeUtil.MILLISECONDS_IN_DAY
 
                         var showEndRecurrenceDatePicker by remember { mutableStateOf(false) }
 
@@ -368,16 +377,16 @@ fun NewEventScreen(
                             if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
                                 mapView.zoomToBoundingBox(
                                     GeoPoint(
-                                        uiState.locationLatitude,
-                                        uiState.locationLongitude
+                                        uiState.locationLatitude!!,
+                                        uiState.locationLongitude!!
                                     ).toBoundingBox(),
                                     false
                                 )
 
                                 mapView.clearAllMarkers()
                                 mapView.addMarker(
-                                    latitude = uiState.locationLatitude,
-                                    longitude = uiState.locationLongitude,
+                                    latitude = uiState.locationLatitude!!,
+                                    longitude = uiState.locationLongitude!!,
                                     text = "${
                                         uiState.locationLatitude.toString().take(6)
                                     }, " +
@@ -385,18 +394,14 @@ fun NewEventScreen(
                                 )
                                 mapView.controller.animateTo(
                                     GeoPoint(
-                                        uiState.locationLatitude,
-                                        uiState.locationLongitude
+                                        uiState.locationLatitude!!,
+                                        uiState.locationLongitude!!
                                     )
                                 )
                             }
                         }
                     }
                 }
-            }
-
-            Button(onClick = onSubmitEventButtonClick) {
-                Text(stringResource(R.string.submit_event))
             }
         }
 
@@ -421,20 +426,20 @@ fun NewEventScreen(
 
                             mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
                                 if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
-                                    mapView.zoomToBoundingBox(ukraineBoundingBox, false)
+                                    mapView.zoomToBoundingBox(OpenStreetMapUtil.ukraineBoundingBox, false)
 
                                     if (uiState.locationLatitude != null && uiState.locationLongitude != null && !locationConfirmed) {
                                         mapView.zoomToBoundingBox(
                                             GeoPoint(
-                                                uiState.locationLatitude,
-                                                uiState.locationLongitude
+                                                uiState.locationLatitude!!,
+                                                uiState.locationLongitude!!
                                             ).toBoundingBox(diff = 0.005),
                                             false
                                         )
                                         mapView.clearAllMarkers()
                                         mapView.addMarker(
-                                            latitude = uiState.locationLatitude,
-                                            longitude = uiState.locationLongitude,
+                                            latitude = uiState.locationLatitude!!,
+                                            longitude = uiState.locationLongitude!!,
                                             text = "${
                                                 uiState.locationLatitude.toString().take(6)
                                             }, " + uiState.locationLongitude.toString().take(6)
@@ -493,19 +498,3 @@ private val mapEventsReceiver = object : MapEventsReceiver {
 }
 
 private val mapEventsOverlay = MapEventsOverlay(mapEventsReceiver)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-fun NewEventScreenPreview() {
-    PrepPalTheme {
-        NewEventScreen(
-            uiState = NewEventScreenUiState(
-                summary = "Комп'ютерні системи",
-                type = Event.Type.Lecture,
-                start = System.currentTimeMillis(),
-                end = System.currentTimeMillis()
-            )
-        )
-    }
-}

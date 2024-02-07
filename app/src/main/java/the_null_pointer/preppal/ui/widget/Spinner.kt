@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -27,6 +29,7 @@ fun <T> Spinner(
     selected: T,
     onSelectionChanged: (T?) -> Unit,
     modifier: Modifier = Modifier,
+    cardColors: CardColors = CardDefaults.outlinedCardColors(),
     initialExpandedState: Boolean = false,
     canSelectNothing: Boolean = false,
     nothingOptionString: String = ""
@@ -36,7 +39,8 @@ fun <T> Spinner(
     OutlinedCard(
         modifier = modifier.clickable {
             expanded = !expanded
-        }
+        },
+        colors = cardColors
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,

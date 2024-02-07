@@ -11,6 +11,9 @@ interface EventDAO {
     @Query("SELECT * FROM event")
     fun observeAll(): Flow<List<Event>>
 
+    @Query("SELECT * FROM event WHERE id = :eventId")
+    fun getById(eventId: Long): Event?
+
     @Query("SELECT * FROM event WHERE id IN (:eventIds)")
     fun getAllByIds(eventIds: LongArray): List<Event>
 
@@ -31,4 +34,10 @@ interface EventDAO {
 
     @Delete
     fun delete(event: Event)
+
+    @Query("DELETE FROM event WHERE id = :eventId")
+    fun delete(eventId: Long)
+
+    @Query("DELETE FROM event WHERE id IN (:eventIds)")
+    fun delete(eventIds: List<Long>)
 }

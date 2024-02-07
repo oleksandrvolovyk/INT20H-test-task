@@ -8,9 +8,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun Calendar(
     viewModel: CalendarViewModel = hiltViewModel(),
-    onNewEventButtonClick: (selectedEpochDay: Long?) -> Unit
+    onNewEventButtonClick: (selectedEpochDay: Long?) -> Unit,
+    onEventClick: (eventId: Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    CalendarScreen(uiState = uiState, onNewEventButtonClick = onNewEventButtonClick)
+    CalendarScreen(
+        uiState = uiState,
+        onNewEventButtonClick = onNewEventButtonClick,
+        onEventClick = onEventClick
+    )
 }

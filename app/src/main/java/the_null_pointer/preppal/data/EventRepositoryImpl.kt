@@ -18,6 +18,10 @@ class EventRepositoryImpl(
         eventDAO.getAllByIds(eventIds)
     }
 
+    override suspend fun getById(eventId: Long): Event? = withContext(ioDispatcher) {
+        eventDAO.getById(eventId)
+    }
+
     override suspend fun getAllBySummary(summary: String): List<Event> = withContext(ioDispatcher) {
         eventDAO.getAllBySummary(summary)
     }
@@ -35,7 +39,15 @@ class EventRepositoryImpl(
         return@withContext eventDAO.insertAll(events).isNotEmpty()
     }
 
-    override suspend fun delete(event: Event) {
+    override suspend fun delete(event: Event) = withContext(ioDispatcher) {
         eventDAO.delete(event)
+    }
+
+    override suspend fun delete(eventId: Long) = withContext(ioDispatcher) {
+        eventDAO.delete(eventId)
+    }
+
+    override suspend fun delete(eventIds: List<Long>) = withContext(ioDispatcher) {
+        eventDAO.delete(eventIds)
     }
 }

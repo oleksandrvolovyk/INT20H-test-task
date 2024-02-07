@@ -29,9 +29,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.ui.calendar.Calendar
+import the_null_pointer.preppal.ui.event.add_new.NewEvent
+import the_null_pointer.preppal.ui.event.edit.EditEvent
 import the_null_pointer.preppal.ui.grades.Grades
 import the_null_pointer.preppal.ui.grades_by_type.GradesByType
-import the_null_pointer.preppal.ui.new_event.NewEvent
 import the_null_pointer.preppal.ui.set_grade.GradeChange
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
@@ -65,29 +66,36 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             Calendar(
                 onNewEventButtonClick = {
                     navController.navigate(NavItem.NewEvent.screenRoute + "?startingEpochDay=$it")
+                },
+                onEventClick = {
+                    navController.navigate(NavItem.EditEvent.screenRoute + "/$it")
                 }
             )
         }
-        composable(BottomNavItem.Grades.screenRoute){
-            Grades(onTypeClick = {type -> navController.navigate(NavItem.GradesByType.screenRoute+"/"+type)})
+        composable(BottomNavItem.Grades.screenRoute) {
+            Grades(onTypeClick = { type -> navController.navigate(NavItem.GradesByType.screenRoute + "/" + type) })
         }
-        composable(NavItem.GradesByType.screenRoute+"/{type}",
-            arguments = listOf(navArgument("type") {type = NavType.StringType })
-        ){backStackEntry ->
-            backStackEntry?.arguments?.getString("type")?.let{type ->
+        composable(
+            NavItem.GradesByType.screenRoute + "/{type}",
+            arguments = listOf(navArgument("type") { type = NavType.StringType })
+        ) { backStackEntry ->
+            backStackEntry?.arguments?.getString("type")?.let { type ->
 
-                GradesByType(onGradeClick = {event -> navController.navigate(NavItem.GradeChange.screenRoute+"/"+event)},
-                    onBackClick = {navController.popBackStack()},
-                    type = type)
+                GradesByType(
+                    onGradeClick = { event -> navController.navigate(NavItem.GradeChange.screenRoute + "/" + event) },
+                    onBackClick = { navController.popBackStack() },
+                    type = type
+                )
             }
 
         }
-        composable(NavItem.GradeChange.screenRoute+"/{event}",
-            arguments = listOf(navArgument("event") {type = NavType.StringType })
+        composable(
+            NavItem.GradeChange.screenRoute + "/{event}",
+            arguments = listOf(navArgument("event") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry?.arguments?.getString("event")?.let{json ->
+            backStackEntry?.arguments?.getString("event")?.let { json ->
                 val event = Gson().fromJson(json, Event::class.java)
-                GradeChange(event = event, onBackClicked = {navController.popBackStack()})
+                GradeChange(event = event, onBackClicked = { navController.popBackStack() })
             }
 
         }
@@ -100,7 +108,12 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         ) {
             NewEvent(onNavigateBack = { navController.popBackStack() })
         }
-
+        composable(
+            NavItem.EditEvent.screenRoute + "/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+        ) {
+            EditEvent(onNavigateBack = { navController.popBackStack() })
+        }
     }
 }
 
