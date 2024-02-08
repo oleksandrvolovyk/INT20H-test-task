@@ -20,13 +20,25 @@ fun YearMonth.displayText(short: Boolean = false): String {
 }
 
 fun Month.displayText(short: Boolean = true): String {
-    val style = if (short) TextStyle.SHORT else TextStyle.FULL
-    return getDisplayName(style, Locale.ENGLISH)
+    val style = if (short) TextStyle.SHORT else TextStyle.FULL_STANDALONE
+
+    if (this == Month.DECEMBER && Locale.getDefault() == Locale.forLanguageTag("uk-UA")) {
+        // Fix the absence of December in the nominative case in the Ukrainian locale
+        return "Грудень"
+    }
+
+    return getDisplayName(style, Locale.getDefault()).replaceFirstChar {
+        if (it.isLowerCase()) {
+            it.titlecase()
+        } else {
+            it.toString()
+        }
+    }
 }
 
 fun DayOfWeek.displayText(uppercase: Boolean = false): String {
-    return getDisplayName(TextStyle.SHORT, Locale.ENGLISH).let { value ->
-        if (uppercase) value.uppercase(Locale.ENGLISH) else value
+    return getDisplayName(TextStyle.SHORT, Locale.getDefault()).let { value ->
+        if (uppercase) value.uppercase(Locale.getDefault()) else value
     }
 }
 
