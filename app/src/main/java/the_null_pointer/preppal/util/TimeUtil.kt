@@ -84,4 +84,8 @@ object TimeUtil {
         return dayOfWeek == Calendar.SATURDAY
                 || dayOfWeek == Calendar.SUNDAY
     }
+
+    fun Long.toEpochDay(): Long {
+        return this / MILLISECONDS_IN_DAY
+    }
 }

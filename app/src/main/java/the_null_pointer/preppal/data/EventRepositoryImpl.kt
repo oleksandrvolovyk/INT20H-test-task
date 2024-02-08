@@ -44,6 +44,10 @@ class EventRepositoryImpl(
         return@withContext eventDAO.insertAll(events).isNotEmpty()
     }
 
+    override suspend fun update(event: Event) = withContext(ioDispatcher) {
+        eventDAO.update(event)
+    }
+
     override suspend fun delete(event: Event) = withContext(ioDispatcher) {
         eventDAO.delete(event)
     }

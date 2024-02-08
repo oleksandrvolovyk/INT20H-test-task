@@ -21,8 +21,6 @@ fun EditEvent(
         uiState = uiState,
         onSummaryValueChange = { viewModel.updateSummary(it) },
         onEventTypeChange = { viewModel.updateEventType(it) },
-        onEventRecurrenceTypeChange = { viewModel.updateRecurrenceType(it) },
-        onRecurrenceEndDateChange = { viewModel.updateRecurrenceEndDate(it) },
         onStartDateChange = { viewModel.updateStartDate(it) },
         onEndDateChange = { viewModel.updateEndDate(it) },
         onReminderStateChange = { viewModel.updateReminderState(it) },
@@ -30,7 +28,7 @@ fun EditEvent(
         onLocationStateChange = { viewModel.updateLocationState(it) },
         onLocationChange = { latitude, longitude -> viewModel.updateLocation(latitude, longitude) },
         onGradedChange = { viewModel.updateGradedState(it) },
-        onSubmitEventButtonClick = { viewModel.submitEvent() },
+        onSubmitChangesButtonClick = { viewModel.submitChanges(it) },
         onDeleteEventButtonClick = { viewModel.deleteEvent(it) }
     )
 

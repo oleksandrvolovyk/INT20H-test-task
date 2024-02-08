@@ -98,9 +98,10 @@ fun BaseEventScreen(
     onLocationStateChange: (Boolean) -> Unit = {},
     onLocationChange: (Double, Double) -> Unit = { _, _ -> },
     onGradedChange: (Boolean) -> Unit = {},
-    defaultLocationConfirmState: Boolean = false
+    defaultLocationConfirmationState: Boolean = false,
+    editMode: Boolean = false
 ) {
-    var locationConfirmed by rememberSaveable { mutableStateOf(defaultLocationConfirmState) }
+    var locationConfirmed by rememberSaveable { mutableStateOf(defaultLocationConfirmationState) }
     Column(Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -236,66 +237,75 @@ fun BaseEventScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Event Recurrence Type
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(modifier = Modifier.weight(0.3f), text = stringResource(R.string.recurrence))
-
-                Spinner(
-                    modifier = Modifier.weight(0.7f),
-                    items = Event.RecurrenceType.values()
-                        .map { it to stringResource(it.stringResourceId) },
-                    selected = uiState.recurrenceType,
-                    onSelectionChanged = { onEventRecurrenceTypeChange(it) },
-                    canSelectNothing = true,
-                    nothingOptionString = stringResource(R.string.never)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            if (uiState.recurrenceType != null) {
-                // Recurrence End date picker
+            // To disable event recurrence and recurrenceEndDate in Edit Event Screen
+            if (!editMode) {
+                // Event Recurrence Type
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(R.string.repeat_until)
+                        modifier = Modifier.weight(0.3f),
+                        text = stringResource(R.string.recurrence)
                     )
 
-                    Row(modifier = Modifier.weight(0.5f), horizontalArrangement = Arrangement.End) {
-                        val endRecurrenceDate =
-                            uiState.recurrenceEndDate - uiState.recurrenceEndDate % TimeUtil.MILLISECONDS_IN_DAY
+                    Spinner(
+                        modifier = Modifier.weight(0.7f),
+                        items = Event.RecurrenceType.values()
+                            .map { it to stringResource(it.stringResourceId) },
+                        selected = uiState.recurrenceType,
+                        onSelectionChanged = { onEventRecurrenceTypeChange(it) },
+                        canSelectNothing = true,
+                        nothingOptionString = stringResource(R.string.never)
+                    )
+                }
 
-                        var showEndRecurrenceDatePicker by remember { mutableStateOf(false) }
+                Spacer(modifier = Modifier.height(4.dp))
 
-                        Box(contentAlignment = Alignment.Center) {
-                            Button(onClick = { showEndRecurrenceDatePicker = true }) {
-                                Text(text = endRecurrenceDate.getReadableDate())
-                            }
-                        }
+                if (uiState.recurrenceType != null) {
+                    // Recurrence End date picker
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(0.5f),
+                            text = stringResource(R.string.repeat_until)
+                        )
 
-                        if (showEndRecurrenceDatePicker) {
-                            MyDatePickerDialog(
-                                initialSelectedDateMillis = endRecurrenceDate,
-                                onDateSelected = { newDateMillis ->
-                                    onRecurrenceEndDateChange(newDateMillis)
-                                },
-                                onDismiss = { showEndRecurrenceDatePicker = false },
-                                isSelectableDate = { utcTimeMillis ->
-                                    utcTimeMillis >= uiState.start
+                        Row(
+                            modifier = Modifier.weight(0.5f),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            val endRecurrenceDate =
+                                uiState.recurrenceEndDate - uiState.recurrenceEndDate % TimeUtil.MILLISECONDS_IN_DAY
+
+                            var showEndRecurrenceDatePicker by remember { mutableStateOf(false) }
+
+                            Box(contentAlignment = Alignment.Center) {
+                                Button(onClick = { showEndRecurrenceDatePicker = true }) {
+                                    Text(text = endRecurrenceDate.getReadableDate())
                                 }
-                            )
+                            }
+
+                            if (showEndRecurrenceDatePicker) {
+                                MyDatePickerDialog(
+                                    initialSelectedDateMillis = endRecurrenceDate,
+                                    onDateSelected = { newDateMillis ->
+                                        onRecurrenceEndDateChange(newDateMillis)
+                                    },
+                                    onDismiss = { showEndRecurrenceDatePicker = false },
+                                    isSelectableDate = { utcTimeMillis ->
+                                        utcTimeMillis >= uiState.start
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+            }
 
             // Reminders
             Row(
@@ -426,7 +436,10 @@ fun BaseEventScreen(
 
                             mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
                                 if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
-                                    mapView.zoomToBoundingBox(OpenStreetMapUtil.ukraineBoundingBox, false)
+                                    mapView.zoomToBoundingBox(
+                                        OpenStreetMapUtil.ukraineBoundingBox,
+                                        false
+                                    )
 
                                     if (uiState.locationLatitude != null && uiState.locationLongitude != null && !locationConfirmed) {
                                         mapView.zoomToBoundingBox(

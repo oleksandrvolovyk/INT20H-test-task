@@ -15,10 +15,12 @@ import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.EventRepository
+import the_null_pointer.preppal.data.Location
 import the_null_pointer.preppal.data.TimestampMillis
 import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.ui.event.BaseEventScreenUiState
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
+import the_null_pointer.preppal.util.TimeUtil.toEpochDay
 import javax.inject.Inject
 
 data class EditEventScreenUiState(
@@ -35,11 +37,17 @@ data class EditEventScreenUiState(
     override val locationLatitude: Double? = null,
     override val locationLongitude: Double? = null,
 
-    override val isGraded: Boolean = false
+    override val isGraded: Boolean = false,
+
+    val availableEditMethods: List<EventEditMethod> = listOf(EventEditMethod.EditOne)
 ) : BaseEventScreenUiState
 
 enum class EventDeleteMethod {
     DeleteOne, DeleteOneAndFollowing, DeleteAll
+}
+
+enum class EventEditMethod {
+    EditOne, EditAll
 }
 
 @HiltViewModel
@@ -49,6 +57,7 @@ class EditEventViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val eventId: Long = savedStateHandle["eventId"]!!
+    private var originalEvent: Event? = null
 
     private val _uiState = MutableStateFlow(EditEventScreenUiState())
     val uiState: StateFlow<EditEventScreenUiState> = _uiState.asStateFlow()
@@ -60,6 +69,7 @@ class EditEventViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val event = eventRepository.getById(eventId)
+            originalEvent = event
 
             val allEventsOfThisType = event?.let {
                 eventRepository.getAllBySummaryAndType(event.summary, event.type)
@@ -88,7 +98,12 @@ class EditEventViewModel @Inject constructor(
                         isLocationEnabled = event.location != null,
                         locationLatitude = event.location?.latitude,
                         locationLongitude = event.location?.longitude,
-                        isGraded = event.graded
+                        isGraded = event.graded,
+                        availableEditMethods = if ((allEventsOfThisType?.size ?: 1) > 1) {
+                            listOf(EventEditMethod.EditOne, EventEditMethod.EditAll)
+                        } else {
+                            listOf(EventEditMethod.EditOne)
+                        }
                     )
                 }
             }
@@ -107,21 +122,16 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
-    fun updateRecurrenceType(newRecurrenceType: Event.RecurrenceType?) {
-        _uiState.update {
-            it.copy(recurrenceType = newRecurrenceType)
-        }
-    }
-
-    fun updateRecurrenceEndDate(newEndDateMillis: Long) {
-        _uiState.update {
-            it.copy(
-                recurrenceEndDate = newEndDateMillis
-            )
-        }
-    }
-
     fun updateStartDate(newStartDateMillis: Long) {
+        // Prevent the user from editing all events if the user has changed the day of the Event
+        if (uiState.value.start.toEpochDay() != newStartDateMillis.toEpochDay()) {
+            _uiState.update {
+                it.copy(
+                    availableEditMethods = listOf(EventEditMethod.EditOne)
+                )
+            }
+        }
+
         if (newStartDateMillis <= uiState.value.end) {
             _uiState.update {
                 it.copy(
@@ -136,19 +146,18 @@ class EditEventViewModel @Inject constructor(
                 )
             }
         }
-
-        // If new start date is larger than current recurrence end date, move the recurrence end to
-        // make sure that startDate is always <= recurrenceEndDate
-        if (newStartDateMillis > uiState.value.recurrenceEndDate) {
-            _uiState.update {
-                it.copy(
-                    recurrenceEndDate = newStartDateMillis
-                )
-            }
-        }
     }
 
     fun updateEndDate(newEndDateMillis: Long) {
+        // Prevent the user from editing all events if the user has changed the day of the Event
+        if (uiState.value.start.toEpochDay() != newEndDateMillis.toEpochDay()) {
+            _uiState.update {
+                it.copy(
+                    availableEditMethods = listOf(EventEditMethod.EditOne)
+                )
+            }
+        }
+
         if (newEndDateMillis >= uiState.value.start) {
             _uiState.update {
                 it.copy(
@@ -206,11 +215,100 @@ class EditEventViewModel @Inject constructor(
         }
     }
 
-    fun submitEvent() = viewModelScope.launch {
-        TODO()
+    fun submitChanges(eventEditMethod: EventEditMethod) = viewModelScope.launch {
+        val currentUiState = uiState.value
+
+        val latitude = currentUiState.locationLatitude
+        val longitude = currentUiState.locationLongitude
+
+        val location =
+            if (latitude != null && longitude != null && currentUiState.isLocationEnabled) {
+                Location(latitude, longitude)
+            } else {
+                null
+            }
+
+        when (eventEditMethod) {
+            EventEditMethod.EditOne -> {
+                val newRemindersTimeMillis = if (currentUiState.isReminderEnabled) {
+                    currentUiState.reminderOffsets.map { reminderOffsetMillis ->
+                        currentUiState.start + reminderOffsetMillis
+                    }
+                } else {
+                    emptyList()
+                }
+
+                eventRepository.update(
+                    Event(
+                        id = eventId,
+                        summary = currentUiState.summary,
+                        type = currentUiState.type,
+                        location = location,
+                        start = currentUiState.start,
+                        end = currentUiState.end,
+                        recurrence = originalEvent?.recurrence,
+                        reminder = newRemindersTimeMillis,
+                        graded = currentUiState.isGraded,
+                        grade = originalEvent?.grade,
+                        maxGrade = originalEvent?.maxGrade
+                    )
+                )
+            }
+
+            EventEditMethod.EditAll -> {
+                val eventsToBeUpdated = eventRepository.getAllBySummaryAndType(
+                    originalEvent!!.summary,
+                    originalEvent!!.type
+                )
+
+                eventsToBeUpdated.forEach { event ->
+                    // Calculate new event starting time using event's epoch day +
+                    // hour and minute offset entered by user
+                    val newEventStartTimeMillis =
+                        event.start.toEpochDay() * MILLISECONDS_IN_DAY +
+                                currentUiState.start % MILLISECONDS_IN_DAY
+
+                    // Calculate new event ending time using event's epoch day +
+                    // hour and minute offset entered by user
+                    val newEventEndTimeMillis =
+                        event.end.toEpochDay() * MILLISECONDS_IN_DAY +
+                                currentUiState.end % MILLISECONDS_IN_DAY
+
+                    val newRemindersTimeMillis = if (currentUiState.isReminderEnabled) {
+                        currentUiState.reminderOffsets.map { reminderOffsetMillis ->
+                            newEventStartTimeMillis + reminderOffsetMillis
+                        }
+                    } else {
+                        emptyList()
+                    }
+
+                    eventRepository.update(
+                        Event(
+                            id = event.id,
+                            summary = currentUiState.summary,
+                            type = currentUiState.type,
+                            location = location,
+                            start = newEventStartTimeMillis,
+                            end = newEventEndTimeMillis,
+                            recurrence = originalEvent?.recurrence,
+                            reminder = newRemindersTimeMillis,
+                            graded = currentUiState.isGraded,
+                            grade = event.grade,
+                            maxGrade = event.maxGrade
+                        )
+                    )
+                }
+            }
+        }
+
+        _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.changes_saved))
+        _sideEffectChannel.trySend(SideEffect.NavigateBack)
     }
 
     fun deleteEvent(eventDeleteMethod: EventDeleteMethod) {
+        if (originalEvent == null) {
+            return
+        }
         _sideEffectChannel.trySend(
             SideEffect.ConfirmAction(
                 R.string.confirm_event_deletion
@@ -224,8 +322,8 @@ class EditEventViewModel @Inject constructor(
 
                         EventDeleteMethod.DeleteOneAndFollowing -> {
                             val eventIdsToBeDeleted = eventRepository.getAllBySummaryAndType(
-                                uiState.value.summary,
-                                uiState.value.type
+                                originalEvent!!.summary,
+                                originalEvent!!.type
                             ).filter { it.start >= uiState.value.start }
                                 .map { it.id }
 
@@ -235,8 +333,8 @@ class EditEventViewModel @Inject constructor(
 
                         EventDeleteMethod.DeleteAll -> {
                             val eventIdsToBeDeleted = eventRepository.getAllBySummaryAndType(
-                                uiState.value.summary,
-                                uiState.value.type
+                                originalEvent!!.summary,
+                                originalEvent!!.type
                             ).map { it.id }
 
                             eventRepository.delete(eventIdsToBeDeleted)

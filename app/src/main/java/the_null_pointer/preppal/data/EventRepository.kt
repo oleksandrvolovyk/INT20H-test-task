@@ -12,6 +12,7 @@ interface EventRepository {
     suspend fun getAllBySummaryAndType(summary: String, type: Event.Type): List<Event>
     suspend fun insert(vararg events: Event)
     suspend fun insertAll(events: List<Event>): Boolean // Returns true if inserted successfully
+    suspend fun update(event: Event)
     suspend fun delete(event: Event)
     suspend fun delete(eventId: Long)
     suspend fun delete(eventIds: List<Long>)

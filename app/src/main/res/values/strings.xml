@@ -44,10 +44,13 @@
     <string name="edit_event">Редагувати подію</string>
     <string name="delete_one_event">Видалити цю подію</string>
     <string name="delete_one_and_following_events">Видалити цю та майбутні події</string>
-    <string name="delete_all_events">Видалитти всі події</string>
+    <string name="delete_all_events">Видалитти всі події у серії</string>
     <string name="delete">Видалити</string>
     <string name="deletion">Видалення</string>
     <string name="yes">Так</string>
     <string name="no">Ні</string>
     <string name="confirm_event_deletion">Видалити подію(-ї)?</string>
+    <string name="save_changes_to_one_event">Зберегти зміни (тільки ця подія)</string>
+    <string name="save_changes_to_all_events">Зберегти зміни (всі події у серії)</string>
+    <string name="changes_saved">Зміни збережено!</string>
 </resources>
