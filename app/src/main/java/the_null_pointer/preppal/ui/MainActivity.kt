@@ -81,21 +81,17 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         ) { backStackEntry ->
             backStackEntry?.arguments?.getString("type")?.let { type ->
 
-                GradesByType(
-                    onGradeClick = { event -> navController.navigate(NavItem.GradeChange.screenRoute + "/" + event) },
-                    onBackClick = { navController.popBackStack() },
-                    type = type
-                )
+                GradesByType(onGradeClick = {id -> navController.navigate(NavItem.GradeChange.screenRoute+"/"+id)},
+                    onBackClick = {navController.popBackStack()},
+                    type = type)
             }
 
         }
-        composable(
-            NavItem.GradeChange.screenRoute + "/{event}",
-            arguments = listOf(navArgument("event") { type = NavType.StringType })
+        composable(NavItem.GradeChange.screenRoute+"/{id}",
+            arguments = listOf(navArgument("id") {type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry?.arguments?.getString("event")?.let { json ->
-                val event = Gson().fromJson(json, Event::class.java)
-                GradeChange(event = event, onBackClicked = { navController.popBackStack() })
+            backStackEntry?.arguments?.getString("id")?.let{id ->
+                GradeChange(eventId = id, onBackClicked = {navController.popBackStack()})
             }
 
         }

@@ -1,6 +1,8 @@
 package the_null_pointer.preppal.ui.set_grade
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
@@ -15,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -37,11 +38,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
-import the_null_pointer.preppal.util.TimeUtil.getReadableDate
+import the_null_pointer.preppal.data.Location
+
 
 @Composable
-fun GradeChangeScreen(event: Event, onBackClicked: () -> Unit = {}) {
+fun GradeChangeScreen(
+    uiState: UiState,
+    eventDetails: GradesChangeScreenUiState,
+    onBackClicked: () -> Unit = {},
+    onCurrentGradeValueChange: (String) -> Unit = {},
+    onMaxGradeValueChange: (String) -> Unit = {}
+) {
+
+    var type = remember { mutableStateOf("") }
+    var summary = remember { mutableStateOf("") }
+    var date = remember { mutableStateOf("") }
+
+    when (uiState) {
+        is UiState.Loading -> {
+            Log.d("GradeChangeScreen", "Load")
+        }
+
+        is UiState.Success -> {
+            type.value = stringResource(eventDetails.eventType)
+            summary.value = eventDetails.eventSummary
+            date.value = eventDetails.eventDate
+        }
+
+        is UiState.Error -> {
+            val errorMessage = (uiState as UiState.Error).message
+
+        }
+    }
+
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -75,55 +104,49 @@ fun GradeChangeScreen(event: Event, onBackClicked: () -> Unit = {}) {
                         contentDescription = "Arrow icon"
                     )
                 }
-                Text(
-                    text = "Оцінка - ${stringResource(id = event.type.stringResourceId)} "
-                )
+                Text(text = type.value)
             }
         }
 
-        SimpleText(text = stringResource(id = event.type.stringResourceId))
-        SimpleText(text = event.end.getReadableDate())
-        SimpleText(text = event.summary)
+        SimpleText(text = type.value)
+        SimpleText(text = date.value)
+        SimpleText(text = summary.value)
 
-        // Move to ViewModel !!
-
-        val getGradeState = remember { mutableStateOf("") }
-        val maxGradeState = remember { mutableStateOf("") }
-
-        Row {
+        // Display current and max grades
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.weight(0.5f),
+                value = if (eventDetails.currentGrade == 0) "" else "${eventDetails.currentGrade}",
+                onValueChange = onCurrentGradeValueChange,
+                placeholder = { Text(text = stringResource(id = R.string.get_grade)) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
 
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.5f),
-                placeholder = { Text(stringResource(id = R.string.get_grade)) },
-                value = getGradeState.value,
-                onValueChange = { grade -> getGradeState.value = grade },
+                modifier = Modifier.fillMaxWidth().weight(0.5f),
+                placeholder = { Text(stringResource(R.string.max_grade)) },
+                value = if (eventDetails.maxGrade == 0) "" else "${eventDetails.maxGrade}",
+                onValueChange = onMaxGradeValueChange,
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.width(5.dp))
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.5f),
-                placeholder = { Text(text = stringResource(id = R.string.max_grade)) },
-                value = maxGradeState.value,
-                onValueChange = { grade -> maxGradeState.value = grade },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Done
-                ),
-                singleLine = true
-            )
         }
     }
 }
+
+
+
 
 @Composable
 fun SimpleText(
@@ -162,19 +185,42 @@ fun SimpleText(
 @Composable
 fun GradesPreview() {
 
-    GradeChangeScreen(
-        event = Event(
-            summary = "summary",
-            type = Event.Type.Exam,
+    val uiState = UiState.Success(
+        Event(
+            id = 1,
+            summary = "Lecture on Kotlin Basics",
+            type = Event.Type.Lecture,
             location = null,
-            start = 12321443213,
-            end = 1232312344423,
-
-            graded = false,
-            grade = 12.0,
-            maxGrade = 15.0
-
-
+            start = System.currentTimeMillis(),
+            end = System.currentTimeMillis() + 3600 * 1000,
+            recurrence = null,
+            reminder = emptyList(),
+            graded = true,
+            grade = 85.0,
+            maxGrade = 100.0
         )
     )
+
+    // Create a mock GradesChangeScreenUiState object for preview
+    val eventDetails = GradesChangeScreenUiState(
+        eventType = 0, // Replace with the appropriate value
+        eventSummary = "Sample Summary", // Replace with the appropriate value
+        eventDate = "Sample Date", // Replace with the appropriate value
+        currentGrade = 0, // Replace with the appropriate value
+        maxGrade = 0 // Replace with the appropriate value
+    )
+
+    // Call the GradeChangeScreen composable function with the mock data
+    GradeChangeScreen(
+        uiState = uiState,
+        eventDetails = eventDetails,
+        onBackClicked = {}
+    )
+
+
+    GradeChangeScreen(
+        uiState =  uiState,
+        eventDetails =  GradesChangeScreenUiState(),
+
+        )
 }

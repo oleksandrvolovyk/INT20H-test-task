@@ -22,6 +22,11 @@ class EventRepositoryImpl(
         eventDAO.getById(eventId)
     }
 
+    override suspend fun getAllById(eventId: Long): Event = withContext(ioDispatcher) {
+        eventDAO.getAllById(eventId)
+    }
+
+
     override suspend fun getAllBySummary(summary: String): List<Event> = withContext(ioDispatcher) {
         eventDAO.getAllBySummary(summary)
     }

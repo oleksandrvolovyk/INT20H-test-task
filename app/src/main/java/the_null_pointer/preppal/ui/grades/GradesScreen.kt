@@ -121,12 +121,10 @@ fun GradesScreen(uiState: GradesScreenUiState, onTypeClick: (String) -> Unit = {
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            items(uiState.events, key = { grade -> grade.id })
+            items(uiState.gradedEvents, key = { grade -> grade.id })
             { grade ->
-
                 // Змінити умову на перевірку саме чи оцінюване завдання
-
-                if (!grade.graded) {
+                if (grade.graded) {
                     GradeRow(grade, onTypeClick)
                 }
 
@@ -150,7 +148,7 @@ fun GradesScreen(uiState: GradesScreenUiState, onTypeClick: (String) -> Unit = {
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            items(uiState.events, key = { grade -> grade.type })
+            items(uiState.events, key = { grade -> grade.id })
             { grade ->
                 ProgressRow(grade)
             }

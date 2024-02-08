@@ -35,12 +35,18 @@ import com.google.gson.Gson
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
+import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
 import the_null_pointer.preppal.util.TimeUtil.getReadableDate
+import java.time.LocalDate
 
 @Composable
 fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
                        onGradeClick: (String) -> Unit = {},
                        onBackClick: () -> Unit = {}) {
+
+    val events = uiState.events
+        .sortedBy { it.end }
+
 
 
     val scrollState = rememberScrollState()
@@ -86,12 +92,12 @@ fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
                 .weight(0.8f)
 
         ) {
-            items(uiState.events, key = { grade -> grade.id })
+            items(events, key = { grade -> grade.id })
             { grade ->
 
                 // TODO: Змінити умову на перевірку саме чи оцінюване завдання
 
-                if(!grade.graded){
+                if(grade.graded){
                     GradeRow(grade, onGradeClick)
                 }
             }
@@ -123,7 +129,7 @@ fun GradeRow( grade: Event, onGradeClick: (String) -> Unit = {} ){
 
                 // TODO: Add navigation in clickable !->
                 .clickable {
-                    onGradeClick(Gson().toJson(grade))
+                    onGradeClick(grade.id.toString())
                 }
             ,
             horizontalArrangement = Arrangement.SpaceBetween,
