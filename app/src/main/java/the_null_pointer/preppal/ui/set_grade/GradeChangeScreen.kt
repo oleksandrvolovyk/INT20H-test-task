@@ -133,7 +133,7 @@ fun GradeChangeScreen(
                 value = if (eventDetails.maxGrade == 0.0) "" else "${eventDetails.maxGrade}",
                 onValueChange = onMaxGradeValueChange,
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 ),
                 singleLine = true
