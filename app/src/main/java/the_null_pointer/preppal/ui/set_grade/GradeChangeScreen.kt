@@ -38,8 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Location
-
 
 @Composable
 fun GradeChangeScreen(
@@ -119,7 +117,7 @@ fun GradeChangeScreen(
         ) {
             OutlinedTextField(
                 modifier = Modifier.weight(0.5f),
-                value = if (eventDetails.currentGrade == 0) "" else "${eventDetails.currentGrade}",
+                value = if (eventDetails.currentGrade == 0.0) "" else "${eventDetails.currentGrade}",
                 onValueChange = onCurrentGradeValueChange,
                 placeholder = { Text(text = stringResource(id = R.string.get_grade)) },
                 keyboardOptions = KeyboardOptions(
@@ -132,7 +130,7 @@ fun GradeChangeScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth().weight(0.5f),
                 placeholder = { Text(stringResource(R.string.max_grade)) },
-                value = if (eventDetails.maxGrade == 0) "" else "${eventDetails.maxGrade}",
+                value = if (eventDetails.maxGrade == 0.0) "" else "${eventDetails.maxGrade}",
                 onValueChange = onMaxGradeValueChange,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Text,
@@ -206,8 +204,8 @@ fun GradesPreview() {
         eventType = 0, // Replace with the appropriate value
         eventSummary = "Sample Summary", // Replace with the appropriate value
         eventDate = "Sample Date", // Replace with the appropriate value
-        currentGrade = 0, // Replace with the appropriate value
-        maxGrade = 0 // Replace with the appropriate value
+        currentGrade = 0.0, // Replace with the appropriate value
+        maxGrade = 0.0 // Replace with the appropriate value
     )
 
     // Call the GradeChangeScreen composable function with the mock data

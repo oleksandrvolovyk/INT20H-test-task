@@ -13,6 +13,9 @@ interface EventDAO {
     fun observeAll(): Flow<List<Event>>
 
     @Query("SELECT * FROM event WHERE id = :eventId")
+    fun observeEventById(eventId: Long): Flow<Event>
+
+    @Query("SELECT * FROM event WHERE id = :eventId")
     fun getById(eventId: Long): Event?
 
     @Query("SELECT * FROM event WHERE id IN (:eventIds)")
@@ -24,12 +27,17 @@ interface EventDAO {
     @Query("SELECT * FROM event WHERE id = :id")
     fun getAllById(id: Long): Event
 
-
     @Query("SELECT * FROM event WHERE summary LIKE :summary")
     fun getAllBySummary(summary: String): List<Event>
 
     @Query("SELECT * FROM event WHERE summary = :summary AND type = :type")
     fun getAllBySummaryAndType(summary: String, type: Event.Type): List<Event>
+
+    @Query("UPDATE event SET grade = :newGrade WHERE id = :eventId")
+    fun setEventGrade(eventId: Long, newGrade: Double)
+
+    @Query("UPDATE event SET max_score = :newMaxGrade WHERE id = :eventId")
+    fun setEventMaxGrade(eventId: Long, newMaxGrade: Double)
 
     @Insert
     fun insert(vararg events: Event)
