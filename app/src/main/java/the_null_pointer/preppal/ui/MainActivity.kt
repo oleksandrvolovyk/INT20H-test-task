@@ -124,11 +124,8 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         composable(
             NavItem.GradeChange.screenRoute + "/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType })
-        ) { backStackEntry ->
-            backStackEntry?.arguments?.getString("id")?.let { id ->
-                GradeChange(eventId = id, onBackClicked = { navController.popBackStack() })
-            }
-
+        ) {
+            GradeChange(onBackClicked = { navController.popBackStack() })
         }
         composable(
             NavItem.NewEvent.screenRoute + "?startingEpochDay={startingEpochDay}",

@@ -9,7 +9,7 @@ class EventRepositoryImpl(
     private val eventDAO: EventDAO
 ) : EventRepository {
     override fun observeEvents(): Flow<List<Event>> = eventDAO.observeAll()
-    override fun observeEventById(eventId: Long) : Flow<Event> = eventDAO.observeEventById(eventId)
+    override fun observeEventById(eventId: Long) : Flow<Event?> = eventDAO.observeEventById(eventId)
 
     override suspend fun getAllByType(type: String): List<Event> = withContext(ioDispatcher) {
         eventDAO.getAllByType(type)
@@ -49,11 +49,11 @@ class EventRepositoryImpl(
         eventDAO.update(event)
     }
 
-    override suspend fun setEventGrade(eventId: Long, newGrade: Double) = withContext(ioDispatcher){
+    override suspend fun setEventGrade(eventId: Long, newGrade: Double?) = withContext(ioDispatcher){
         eventDAO.setEventGrade(eventId, newGrade)
     }
 
-    override suspend fun setEventMaxGrade(eventId: Long, newMaxGrade: Double) = withContext(ioDispatcher){
+    override suspend fun setEventMaxGrade(eventId: Long, newMaxGrade: Double?) = withContext(ioDispatcher){
         eventDAO.setEventMaxGrade(eventId, newMaxGrade)
     }
 

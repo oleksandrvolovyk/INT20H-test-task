@@ -13,7 +13,7 @@ interface EventDAO {
     fun observeAll(): Flow<List<Event>>
 
     @Query("SELECT * FROM event WHERE id = :eventId")
-    fun observeEventById(eventId: Long): Flow<Event>
+    fun observeEventById(eventId: Long): Flow<Event?>
 
     @Query("SELECT * FROM event WHERE id = :eventId")
     fun getById(eventId: Long): Event?
@@ -34,10 +34,10 @@ interface EventDAO {
     fun getAllBySummaryAndType(summary: String, type: Event.Type): List<Event>
 
     @Query("UPDATE event SET grade = :newGrade WHERE id = :eventId")
-    fun setEventGrade(eventId: Long, newGrade: Double)
+    fun setEventGrade(eventId: Long, newGrade: Double?)
 
     @Query("UPDATE event SET max_score = :newMaxGrade WHERE id = :eventId")
-    fun setEventMaxGrade(eventId: Long, newMaxGrade: Double)
+    fun setEventMaxGrade(eventId: Long, newMaxGrade: Double?)
 
     @Query("UPDATE event SET completed = :completed WHERE id = :eventId")
     fun setEventCompletion(eventId: Long, completed: Boolean?)

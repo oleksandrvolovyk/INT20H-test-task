@@ -89,6 +89,15 @@ data class Event(
                 }
         }
     }
+
+    companion object {
+        val Empty = Event(
+            summary = "",
+            type = Event.Type.Task,
+            start = 0,
+            end = 0
+        )
+    }
 }
 
 typealias TimestampMillis = Long

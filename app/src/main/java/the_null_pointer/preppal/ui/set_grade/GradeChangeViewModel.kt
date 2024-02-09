@@ -1,83 +1,63 @@
 package the_null_pointer.preppal.ui.set_grade
 
-import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.data.EventRepository
-import the_null_pointer.preppal.util.TimeUtil.getReadableDate
+import the_null_pointer.preppal.ui.SideEffect
 import javax.inject.Inject
 
 data class GradesChangeScreenUiState(
-    val id: Long = 0L,
-    val eventType: Int = 0,
-    val eventSummary: String = "",
-    val eventDate: String = "",
-    val currentGrade: Double = 0.0,
-    val maxGrade: Double = 0.0
+    val event: Event = Event.Empty
 )
 
 @HiltViewModel
 class GradeChangeViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val eventRepository: EventRepository
 ) : ViewModel() {
 
-    private val _eventDetails = MutableStateFlow(GradesChangeScreenUiState())
-    val eventDetails: StateFlow<GradesChangeScreenUiState> = _eventDetails.asStateFlow()
+    private val eventId: Long = savedStateHandle.get<String>("id")!!.toLong()
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    val uiState: StateFlow<UiState> = _uiState
-    fun getEvents(id: Long) {
-        viewModelScope.launch {
-            try {
-                val event = eventRepository.getAllById(id)
-                _uiState.value = UiState.Success(event)
-
-                _eventDetails.update { it.copy(id = id) }
-                _eventDetails.update { it.copy(eventType = event.type.stringResourceId) }
-                _eventDetails.update {it.copy(eventSummary =  event.summary)}
-                _eventDetails.update {it.copy(eventDate =  event.end.getReadableDate())}
-                _eventDetails.update { it.copy(currentGrade = event.grade ?: 0.0) }
-                _eventDetails.update { it.copy(maxGrade = event.maxGrade ?: 0.0) }
-
-        } catch (e: Exception) {
-            _uiState.value = UiState.Error(e.message ?: "Unknown error")
+    val uiState: StateFlow<GradesChangeScreenUiState> = eventRepository.observeEventById(eventId)
+        .map {
+            if (it != null) {
+                GradesChangeScreenUiState(it)
+            } else {
+                // Event was removed from the database, so navigate back
+                _sideEffectChannel.trySend(SideEffect.NavigateBack)
+                GradesChangeScreenUiState()
+            }
         }
-    }
-}
-    fun updateCurrentGrade(currentGrade: String) {
-        _eventDetails.update {
-            it.copy(currentGrade = currentGrade.toDouble() )
-        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            GradesChangeScreenUiState()
+        )
 
-        viewModelScope.launch {
-            eventRepository.setEventGrade(eventDetails.value.id, currentGrade.toDouble())
-        }
+    private val _sideEffectChannel = Channel<SideEffect>(capacity = Channel.BUFFERED)
+    val sideEffectFlow: Flow<SideEffect>
+        get() = _sideEffectChannel.receiveAsFlow()
 
+    fun updateCurrentGrade(currentGrade: String) = viewModelScope.launch {
+        eventRepository.setEventGrade(eventId, currentGrade.toDoubleOrNull())
     }
 
-    fun updateMaxGrade(maxGrade: String) {
-        _eventDetails.update {
-            it.copy(maxGrade =  maxGrade.toDouble())
-        }
-        viewModelScope.launch {
-            eventRepository.setEventMaxGrade(eventDetails.value.id, maxGrade.toDouble())
-        }
+    fun updateMaxGrade(maxGrade: String) = viewModelScope.launch {
+        eventRepository.setEventMaxGrade(eventId, maxGrade.toDouble())
     }
 
-}
-
-sealed class UiState {
-    object Loading : UiState()
-    data class Success(val event: Event) : UiState()
-    data class Error(val message: String) : UiState()
-
+    fun updateEventCompletion(completed: Boolean) = viewModelScope.launch {
+        eventRepository.setEventCompletion(eventId, completed)
+    }
 }
