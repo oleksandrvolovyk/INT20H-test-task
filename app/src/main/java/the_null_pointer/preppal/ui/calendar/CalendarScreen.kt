@@ -69,10 +69,10 @@ import java.time.DayOfWeek
 import java.time.YearMonth
 
 private val pageBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.background
-private val itemBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.primary
-private val toolbarColor: Color @Composable get() = MaterialTheme.colorScheme.primary
+private val itemBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.tertiaryContainer
+private val toolbarColor: Color @Composable get() = MaterialTheme.colorScheme.tertiaryContainer
 private val selectedItemBorderColor: Color @Composable get() = MaterialTheme.colorScheme.secondary
-private val inActiveTextColor: Color @Composable get() = MaterialTheme.colorScheme.onSurface
+private val inActiveTextColor: Color @Composable get() = MaterialTheme.colorScheme.onTertiaryContainer
 
 @Composable
 fun CalendarScreen(
@@ -102,8 +102,7 @@ fun CalendarScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.add_new_event),
-                    tint = Color.White
+                    contentDescription = stringResource(id = R.string.add_new_event)
                 )
             }
         }
@@ -154,7 +153,7 @@ fun CalendarScreen(
                     dayContent = { day ->
                         CompositionLocalProvider(LocalRippleTheme provides CalendarRippleTheme) {
                             val colors = if (day.position == DayPosition.MonthDate) {
-                                uiState.events[day.date].orEmpty().map { Color.White } // HARDCODED
+                                uiState.events[day.date].orEmpty().map { MaterialTheme.colorScheme.onTertiaryContainer }
                             } else {
                                 emptyList()
                             }
@@ -258,7 +257,7 @@ private fun MonthHeader(
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 text = dayOfWeek.displayText(uppercase = true),
                 fontWeight = FontWeight.Light,
             )
@@ -281,7 +280,7 @@ private fun LazyItemScope.EventInformation(
     ) {
         Box(
             modifier = Modifier
-                .background(color = Color.Green) // HARDCODED
+                .background(color = MaterialTheme.colorScheme.primaryContainer)
                 .fillParentMaxWidth(1 / 7f)
                 .aspectRatio(1f),
             contentAlignment = Alignment.Center,
@@ -289,6 +288,7 @@ private fun LazyItemScope.EventInformation(
             Text(
                 text = "${event.start.getHourAsString()}:${event.start.getMinuteAsString()}\n" +
                         "${event.end.getHourAsString()}:${event.end.getMinuteAsString()}",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center,
                 lineHeight = 17.sp,
                 fontSize = 12.sp,

@@ -61,5 +61,5 @@
     <string name="access_type_progress">Відкрити прогрес %1$s</string>
     <string name="go_back">Назад</string>
     <string name="progress_of_type">Прогрес: %1$s</string>
-    <string name="progress_of_summary_and_type">Прогрес: %2$s. %1$s</string>
+    <string name="progress_of_summary_and_type">Прогрес: %2$s\n%1$s</string>
 </resources>

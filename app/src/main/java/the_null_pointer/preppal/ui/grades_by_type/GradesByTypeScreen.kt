@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,9 +16,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import the_null_pointer.preppal.R
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.google.gson.Gson
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
@@ -58,31 +61,29 @@ fun GradesByTypeScreen(uiState: GradesByTypeScreenUiState,
                 enabled = true
             )
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.scoreBoard),
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(6.dp)
-                )
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_arrow_left),
+                contentDescription = stringResource(R.string.go_back),
+                modifier = Modifier
+                    .defaultMinSize(48.dp, 48.dp)
+                    .clickable { onBackClick() }
+                    .align(Alignment.CenterStart)
+            )
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_left),
-                        contentDescription = "Access Time",
-                        tint = Color.Black,
-                        modifier = Modifier
-                            .width(50.dp)
-                            .align(Alignment.CenterStart)
-                            .clickable { onBackClick() }
-                    )
-
-            }
+            Text(
+                text = stringResource(R.string.scoreBoard),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+            )
         }
 
         LazyColumn(
@@ -116,7 +117,7 @@ fun GradeRow( grade: Event, onGradeClick: (String) -> Unit = {} ){
             .padding(6.dp),
         border =  androidx.compose.foundation.BorderStroke(
             width = 3.dp,
-            color = colors.secondary
+            color = MaterialTheme.colorScheme.outline
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp

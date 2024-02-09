@@ -3,6 +3,7 @@ package the_null_pointer.preppal.ui.progress.by_type
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -14,16 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,9 +45,8 @@ fun ProgressByTypeScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_left),
@@ -55,6 +54,7 @@ fun ProgressByTypeScreen(
                 modifier = Modifier
                     .defaultMinSize(48.dp, 48.dp)
                     .clickable { onBackClick() }
+                    .align(Alignment.CenterStart)
             )
 
             Text(
@@ -66,7 +66,10 @@ fun ProgressByTypeScreen(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 20.sp,
-                modifier = Modifier.padding(6.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
             )
         }
 
@@ -94,7 +97,7 @@ fun ProgressRow(
             .height(70.dp)
             .clip(shape = RoundedCornerShape(4.dp))
             .padding(6.dp),
-        border = BorderStroke(width = 3.dp, color = MaterialTheme.colors.secondary),
+        border = BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.outline),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
         Row(
@@ -131,7 +134,6 @@ fun ProgressRow(
                     R.string.access_type_progress,
                     eventType
                 ),
-                tint = Color.Black,
                 modifier = Modifier
                     .size(48.dp)
                     .padding(8.dp)

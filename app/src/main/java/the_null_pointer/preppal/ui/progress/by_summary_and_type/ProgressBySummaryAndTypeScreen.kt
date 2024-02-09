@@ -3,6 +3,7 @@ package the_null_pointer.preppal.ui.progress.by_summary_and_type
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -13,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
@@ -45,9 +46,8 @@ fun ProgressBySummaryAndTypeScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_left),
@@ -55,6 +55,7 @@ fun ProgressBySummaryAndTypeScreen(
                 modifier = Modifier
                     .defaultMinSize(48.dp, 48.dp)
                     .clickable { onBackClick() }
+                    .align(Alignment.CenterStart)
             )
 
             Text(
@@ -64,10 +65,13 @@ fun ProgressBySummaryAndTypeScreen(
                     stringResource(uiState.eventType.stringResourceId)
                 ),
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 20.sp,
-                modifier = Modifier.padding(6.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
             )
         }
 
@@ -101,7 +105,7 @@ fun ProgressRow(
             .padding(6.dp),
         border = BorderStroke(
             width = 3.dp,
-            color = MaterialTheme.colors.secondary
+            color = MaterialTheme.colorScheme.outline
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp
