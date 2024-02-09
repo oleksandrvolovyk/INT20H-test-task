@@ -36,6 +36,14 @@ import the_null_pointer.preppal.ui.progress.by_type.ProgressByType
 import the_null_pointer.preppal.ui.set_grade.GradeChange
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
+import the_null_pointer.preppal.util.UiUtil.defaultEnterTransition
+import the_null_pointer.preppal.util.UiUtil.defaultExitTransition
+import the_null_pointer.preppal.util.UiUtil.defaultPopEnterTransition
+import the_null_pointer.preppal.util.UiUtil.defaultPopExitTransition
+import the_null_pointer.preppal.util.UiUtil.defaultVerticalEnterTransition
+import the_null_pointer.preppal.util.UiUtil.defaultVerticalExitTransition
+import the_null_pointer.preppal.util.UiUtil.defaultVerticalPopEnterTransition
+import the_null_pointer.preppal.util.UiUtil.defaultVerticalPopExitTransition
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -62,7 +70,31 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         navController = navController,
         startDestination = BottomNavItem.Calendar.screenRoute,
     ) {
-        composable(BottomNavItem.Calendar.screenRoute) {
+        composable(
+            route = BottomNavItem.Calendar.screenRoute,
+            enterTransition = { defaultEnterTransition },
+            exitTransition = {
+                if (targetState.destination.route in listOf(
+                        NavItem.EditEvent.screenRoute + "/{eventId}",
+                        NavItem.NewEvent.screenRoute + "?startingEpochDay={startingEpochDay}"
+                    )
+                )
+                    defaultVerticalExitTransition
+                else
+                    defaultExitTransition
+            },
+            popEnterTransition = {
+                if (initialState.destination.route in listOf(
+                        NavItem.EditEvent.screenRoute + "/{eventId}",
+                        NavItem.NewEvent.screenRoute + "?startingEpochDay={startingEpochDay}"
+                    )
+                )
+                    defaultVerticalPopEnterTransition
+                else
+                    defaultPopEnterTransition
+            },
+            popExitTransition = { defaultPopExitTransition }
+        ) {
             Calendar(
                 onNewEventButtonClick = {
                     navController.navigate(NavItem.NewEvent.screenRoute + "?startingEpochDay=$it")
@@ -75,7 +107,13 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
                 }
             )
         }
-        composable(BottomNavItem.Grades.screenRoute) {
+        composable(
+            route = BottomNavItem.Grades.screenRoute,
+            enterTransition = { defaultEnterTransition },
+            exitTransition = { defaultExitTransition },
+            popEnterTransition = { defaultPopEnterTransition },
+            popExitTransition = { defaultPopExitTransition }
+        ) {
             Grades(
                 onGradesTypeClick = { type ->
                     navController.navigate(NavItem.GradesByType.screenRoute + "/" + type)
@@ -86,8 +124,12 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             )
         }
         composable(
-            NavItem.GradesByType.screenRoute + "/{type}",
-            arguments = listOf(navArgument("type") { type = NavType.StringType })
+            route = NavItem.GradesByType.screenRoute + "/{type}",
+            arguments = listOf(navArgument("type") { type = NavType.StringType }),
+            enterTransition = { defaultEnterTransition },
+            exitTransition = { defaultExitTransition },
+            popEnterTransition = { defaultPopEnterTransition },
+            popExitTransition = { defaultPopExitTransition }
         ) { backStackEntry ->
             backStackEntry?.arguments?.getString("type")?.let { type ->
 
@@ -99,8 +141,12 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             }
         }
         composable(
-            NavItem.ProgressByType.screenRoute + "/{type}",
-            arguments = listOf(navArgument("type") { type = NavType.StringType })
+            route = NavItem.ProgressByType.screenRoute + "/{type}",
+            arguments = listOf(navArgument("type") { type = NavType.StringType }),
+            enterTransition = { defaultEnterTransition },
+            exitTransition = { defaultExitTransition },
+            popEnterTransition = { defaultPopEnterTransition },
+            popExitTransition = { defaultPopExitTransition }
         ) {
             ProgressByType(
                 onSummaryAndTypeClick = { summary, type ->
@@ -110,11 +156,15 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             )
         }
         composable(
-            NavItem.ProgressBySummaryAndType.screenRoute + "/{type}/{summary}",
+            route = NavItem.ProgressBySummaryAndType.screenRoute + "/{type}/{summary}",
             arguments = listOf(
                 navArgument("type") { type = NavType.StringType },
                 navArgument("summary") { type = NavType.StringType }
-            )
+            ),
+            enterTransition = { defaultEnterTransition },
+            exitTransition = { defaultExitTransition },
+            popEnterTransition = { defaultPopEnterTransition },
+            popExitTransition = { defaultPopExitTransition }
         ) {
             ProgressBySummaryAndType(
                 onEventClick = { navController.navigate(NavItem.GradeChange.screenRoute + "/$it") },
@@ -123,7 +173,11 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         }
         composable(
             NavItem.GradeChange.screenRoute + "/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            enterTransition = { defaultEnterTransition },
+            exitTransition = { defaultExitTransition },
+            popEnterTransition = { defaultPopEnterTransition },
+            popExitTransition = { defaultPopExitTransition }
         ) {
             GradeChange(onBackClicked = { navController.popBackStack() })
         }
@@ -132,13 +186,21 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             arguments = listOf(navArgument("startingEpochDay") {
                 type = NavType.LongType
                 defaultValue = System.currentTimeMillis() / MILLISECONDS_IN_DAY
-            })
+            }),
+            enterTransition = { defaultVerticalEnterTransition },
+            exitTransition = { defaultVerticalExitTransition },
+            popEnterTransition = { defaultVerticalPopEnterTransition },
+            popExitTransition = { defaultVerticalPopExitTransition }
         ) {
             NewEvent(onNavigateBack = { navController.popBackStack() })
         }
         composable(
             NavItem.EditEvent.screenRoute + "/{eventId}",
-            arguments = listOf(navArgument("eventId") { type = NavType.LongType })
+            arguments = listOf(navArgument("eventId") { type = NavType.LongType }),
+            enterTransition = { defaultVerticalEnterTransition },
+            exitTransition = { defaultVerticalExitTransition },
+            popEnterTransition = { defaultVerticalPopEnterTransition },
+            popExitTransition = { defaultVerticalPopExitTransition }
         ) {
             EditEvent(onNavigateBack = { navController.popBackStack() })
         }
