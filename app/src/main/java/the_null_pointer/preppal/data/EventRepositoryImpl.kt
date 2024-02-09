@@ -56,6 +56,11 @@ class EventRepositoryImpl(
     override suspend fun setEventMaxGrade(eventId: Long, newMaxGrade: Double) = withContext(ioDispatcher){
         eventDAO.setEventMaxGrade(eventId, newMaxGrade)
     }
+
+    override suspend fun setEventCompletion(eventId: Long, completed: Boolean?) = withContext(ioDispatcher) {
+        eventDAO.setEventCompletion(eventId, completed)
+    }
+
     override suspend fun delete(event: Event) = withContext(ioDispatcher) {
         eventDAO.delete(event)
     }

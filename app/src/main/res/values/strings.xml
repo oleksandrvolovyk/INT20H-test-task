@@ -53,4 +53,8 @@
     <string name="save_changes_to_one_event">Зберегти зміни (тільки ця подія)</string>
     <string name="save_changes_to_all_events">Зберегти зміни (всі події у серії)</string>
     <string name="changes_saved">Зміни збережено!</string>
+    <string name="attended">Відвідано</string>
+    <string name="passed">Складено</string>
+    <string name="done">Виконано</string>
+    <string name="grade">Оцінка\n%1$s / %2$s</string>
 </resources>

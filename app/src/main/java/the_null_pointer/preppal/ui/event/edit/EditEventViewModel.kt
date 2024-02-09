@@ -250,7 +250,8 @@ class EditEventViewModel @Inject constructor(
                         reminder = newRemindersTimeMillis,
                         graded = currentUiState.isGraded,
                         grade = originalEvent?.grade,
-                        maxGrade = originalEvent?.maxGrade
+                        maxGrade = originalEvent?.maxGrade,
+                        completed = originalEvent?.completed
                     )
                 )
             }
@@ -294,7 +295,8 @@ class EditEventViewModel @Inject constructor(
                             reminder = newRemindersTimeMillis,
                             graded = currentUiState.isGraded,
                             grade = event.grade,
-                            maxGrade = event.maxGrade
+                            maxGrade = event.maxGrade,
+                            completed = event.completed
                         )
                     )
                 }

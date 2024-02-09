@@ -39,6 +39,9 @@ interface EventDAO {
     @Query("UPDATE event SET max_score = :newMaxGrade WHERE id = :eventId")
     fun setEventMaxGrade(eventId: Long, newMaxGrade: Double)
 
+    @Query("UPDATE event SET completed = :completed WHERE id = :eventId")
+    fun setEventCompletion(eventId: Long, completed: Boolean?)
+
     @Insert
     fun insert(vararg events: Event)
 

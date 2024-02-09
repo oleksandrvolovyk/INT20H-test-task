@@ -41,7 +41,13 @@ data class Event(
     val grade: Double? = null,
 
     @ColumnInfo(name = "max_score")
-    val maxGrade: Double? = null
+    val maxGrade: Double? = null,
+
+    /**
+     * Means "completed" or "attended", depending on Event Type
+     */
+    @ColumnInfo(name = "completed")
+    val completed: Boolean? = null
 ) {
     enum class Type {
         Lecture, Exam, Lab, Practice, Task, Seminar;
@@ -56,6 +62,8 @@ data class Event(
                     Task -> R.string.task
                     Seminar -> R.string.seminar
                 }
+
+            val CompletableTypes = listOf(Lecture, Exam, Practice, Task, Seminar)
         }
     }
 

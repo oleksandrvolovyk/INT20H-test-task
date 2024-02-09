@@ -61,10 +61,10 @@ import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
+import the_null_pointer.preppal.ui.widget.CheckboxWithoutPadding
 import the_null_pointer.preppal.util.TimeUtil.getHourAsString
 import the_null_pointer.preppal.util.TimeUtil.getMinuteAsString
 import java.time.DayOfWeek
-import java.time.LocalDate
 import java.time.YearMonth
 
 private val pageBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.background
@@ -73,18 +73,14 @@ private val toolbarColor: Color @Composable get() = MaterialTheme.colorScheme.pr
 private val selectedItemBorderColor: Color @Composable get() = MaterialTheme.colorScheme.secondary
 private val inActiveTextColor: Color @Composable get() = MaterialTheme.colorScheme.onSurface
 
-private const val MILLISECONDS_IN_DAY = 86_400_000
-
 @Composable
 fun CalendarScreen(
     uiState: CalendarScreenUiState,
     onNewEventButtonClick: (selectedEpochDay: Long?) -> Unit = {},
-    onEventClick: (eventId: Long) -> Unit = {}
+    onEventClick: (eventId: Long) -> Unit = {},
+    onEventCompletionChange: (eventId: Long, Boolean) -> Unit = { _, _ -> },
+    onEventGradeClick: (eventId: Long) -> Unit = {}
 ) {
-    val events = uiState.events
-        .sortedBy { it.start }
-        .groupBy { LocalDate.ofEpochDay(it.start / MILLISECONDS_IN_DAY) }
-
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(500) }
     val endMonth = remember { currentMonth.plusMonths(500) }
@@ -92,9 +88,9 @@ fun CalendarScreen(
     val daysOfWeek = remember { daysOfWeek() }
     var eventsInSelectedDate by remember { mutableStateOf<List<Event>>(emptyList()) }
 
-    LaunchedEffect(selection) {
+    LaunchedEffect(selection, uiState.events) {
         val date = selection?.date
-        eventsInSelectedDate = if (date == null) emptyList() else events[date].orEmpty()
+        eventsInSelectedDate = if (date == null) emptyList() else uiState.events[date].orEmpty()
     }
 
     Scaffold(
@@ -157,7 +153,7 @@ fun CalendarScreen(
                     dayContent = { day ->
                         CompositionLocalProvider(LocalRippleTheme provides CalendarRippleTheme) {
                             val colors = if (day.position == DayPosition.MonthDate) {
-                                events[day.date].orEmpty().map { Color.White } // HARDCODED
+                                uiState.events[day.date].orEmpty().map { Color.White } // HARDCODED
                             } else {
                                 emptyList()
                             }
@@ -186,7 +182,9 @@ fun CalendarScreen(
                     items(items = eventsInSelectedDate) { event ->
                         EventInformation(
                             modifier = Modifier.clickable { onEventClick(event.id) },
-                            event = event
+                            event = event,
+                            onEventCompletionChange = onEventCompletionChange,
+                            onEventGradeClick = onEventGradeClick
                         )
                     }
                 }
@@ -268,7 +266,12 @@ private fun MonthHeader(
 }
 
 @Composable
-private fun LazyItemScope.EventInformation(event: Event, modifier: Modifier = Modifier) {
+private fun LazyItemScope.EventInformation(
+    event: Event,
+    modifier: Modifier = Modifier,
+    onEventCompletionChange: (eventId: Long, Boolean) -> Unit,
+    onEventGradeClick: (eventId: Long) -> Unit
+) {
     Row(
         modifier = modifier
             .fillParentMaxWidth()
@@ -295,40 +298,101 @@ private fun LazyItemScope.EventInformation(event: Event, modifier: Modifier = Mo
                 .weight(1f)
                 .fillMaxHeight(),
         ) {
-            EventDetails(uiEvent = event)
+            EventDetails(event = event, onEventCompletionChange, onEventGradeClick)
         }
     }
     Divider(thickness = 2.dp)
 }
 
 @Composable
-private fun EventDetails(uiEvent: Event) {
+private fun EventDetails(
+    event: Event,
+    onEventCompletionChange: (eventId: Long, Boolean) -> Unit,
+    onEventGradeClick: (eventId: Long) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
     ) {
-        Column(
-            modifier = Modifier
-                .weight(0.7f)
-                .fillMaxHeight()
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(uiEvent.type.stringResourceId),
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Black,
-            )
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = uiEvent.summary,
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Light,
-            )
+            Column(
+                modifier = Modifier
+                    .weight(0.7f)
+                    .fillMaxHeight()
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(event.type.stringResourceId),
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = event.summary,
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Light,
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (event.completed != null) {
+                    Column(
+                        modifier = Modifier.padding(end = 4.dp).fillMaxHeight(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        when (event.type) {
+                            Event.Type.Lecture, Event.Type.Practice, Event.Type.Seminar -> {
+                                Text(text = stringResource(R.string.attended))
+                            }
+
+                            Event.Type.Exam -> {
+                                Text(text = stringResource(R.string.passed))
+                            }
+
+                            Event.Type.Lab -> {}
+
+                            Event.Type.Task -> {
+                                Text(text = stringResource(R.string.done))
+                            }
+                        }
+
+                        CheckboxWithoutPadding(
+                            checked = event.completed,
+                            onCheckedChange = { onEventCompletionChange(event.id, it) }
+                        )
+                    }
+                }
+
+                if (event.graded) {
+                    Column(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .fillMaxHeight()
+                            .clickable { onEventGradeClick(event.id) },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = stringResource(
+                                R.string.grade,
+                                event.grade?.toString() ?: "-",
+                                event.maxGrade?.toString() ?: "-"
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 }

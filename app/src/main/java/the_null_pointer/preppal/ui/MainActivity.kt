@@ -69,6 +69,9 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
                 },
                 onEventClick = {
                     navController.navigate(NavItem.EditEvent.screenRoute + "/$it")
+                },
+                onEventGradeClick = {
+                    navController.navigate(NavItem.GradeChange.screenRoute + "/$it")
                 }
             )
         }

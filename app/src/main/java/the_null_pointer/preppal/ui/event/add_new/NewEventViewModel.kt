@@ -40,7 +40,7 @@ data class NewEventScreenUiState(
     override val locationLongitude: Double? = null,
 
     override val isGraded: Boolean = false
-): BaseEventScreenUiState
+) : BaseEventScreenUiState
 
 @HiltViewModel
 class NewEventViewModel @Inject constructor(
@@ -222,6 +222,12 @@ class NewEventViewModel @Inject constructor(
         // If Event is recurrent, create n needed events, instead of one
         val events = arrayListOf<Event>()
 
+        val completedFieldValue = if (currentUiState.type in Event.Type.CompletableTypes) {
+            false
+        } else {
+            null
+        }
+
         val baseEvent = Event(
             summary = currentUiState.summary,
             type = currentUiState.type,
@@ -230,7 +236,8 @@ class NewEventViewModel @Inject constructor(
             end = currentUiState.end,
             recurrence = currentUiState.recurrenceType,
             reminder = emptyList(),
-            graded = currentUiState.isGraded
+            graded = currentUiState.isGraded,
+            completed = completedFieldValue
         )
 
         if (currentUiState.recurrenceType != null) {
@@ -297,16 +304,10 @@ class NewEventViewModel @Inject constructor(
         }
 
         if (eventRepository.insertAll(eventsWithReminders)) {
-            _sideEffectChannel.trySend(
-                SideEffect.ShowToast(R.string.event_successfully_saved)
-            )
-            _sideEffectChannel.trySend(
-                SideEffect.NavigateBack
-            )
+            _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.event_successfully_saved))
+            _sideEffectChannel.trySend(SideEffect.NavigateBack)
         } else {
-            _sideEffectChannel.trySend(
-                SideEffect.ShowToast(R.string.event_failed_to_save)
-            )
+            _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.event_failed_to_save))
         }
     }
 
@@ -332,15 +333,9 @@ class NewEventViewModel @Inject constructor(
         while (startDayMillis + currentDayOffsetMillis <= recurrenceEndDayMillis) {
             if (dayCondition?.invoke(startDayMillis + currentDayOffsetMillis) != false) {
                 events.add(
-                    Event(
-                        summary = baseEvent.summary,
-                        type = baseEvent.type,
-                        location = baseEvent.location,
+                    baseEvent.copy(
                         start = baseEvent.start + currentDayOffsetMillis,
                         end = baseEvent.end + currentDayOffsetMillis,
-                        recurrence = baseEvent.recurrence,
-                        reminder = baseEvent.reminder,
-                        graded = baseEvent.graded
                     )
                 )
             }

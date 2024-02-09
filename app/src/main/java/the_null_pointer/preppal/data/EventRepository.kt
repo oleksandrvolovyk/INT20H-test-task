@@ -13,6 +13,7 @@ interface EventRepository {
     suspend fun getAllBySummaryAndType(summary: String, type: Event.Type): List<Event>
     suspend fun setEventGrade(eventId: Long, newGrade: Double)
     suspend fun setEventMaxGrade(eventId: Long, newMaxGrade: Double)
+    suspend fun setEventCompletion(eventId: Long, completed: Boolean?)
     suspend fun insert(vararg events: Event)
     suspend fun insertAll(events: List<Event>): Boolean // Returns true if inserted successfully
     suspend fun update(event: Event)
