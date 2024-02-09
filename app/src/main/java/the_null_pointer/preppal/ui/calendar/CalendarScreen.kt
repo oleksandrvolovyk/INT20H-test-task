@@ -59,6 +59,7 @@ import com.kizitonwose.calendar.core.previousMonth
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
+import the_null_pointer.preppal.data.Event.Type.Companion.completionStringResourceId
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.ui.widget.CheckboxWithoutPadding
@@ -346,25 +347,13 @@ private fun EventDetails(
             ) {
                 if (event.completed != null) {
                     Column(
-                        modifier = Modifier.padding(end = 4.dp).fillMaxHeight(),
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .fillMaxHeight(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        when (event.type) {
-                            Event.Type.Lecture, Event.Type.Practice, Event.Type.Seminar -> {
-                                Text(text = stringResource(R.string.attended))
-                            }
-
-                            Event.Type.Exam -> {
-                                Text(text = stringResource(R.string.passed))
-                            }
-
-                            Event.Type.Lab -> {}
-
-                            Event.Type.Task -> {
-                                Text(text = stringResource(R.string.done))
-                            }
-                        }
+                        Text(text = stringResource(event.type.completionStringResourceId))
 
                         CheckboxWithoutPadding(
                             checked = event.completed,

@@ -24,15 +24,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.ui.calendar.Calendar
 import the_null_pointer.preppal.ui.event.add_new.NewEvent
 import the_null_pointer.preppal.ui.event.edit.EditEvent
 import the_null_pointer.preppal.ui.grades.Grades
 import the_null_pointer.preppal.ui.grades_by_type.GradesByType
+import the_null_pointer.preppal.ui.progress.by_summary_and_type.ProgressBySummaryAndType
+import the_null_pointer.preppal.ui.progress.by_type.ProgressByType
 import the_null_pointer.preppal.ui.set_grade.GradeChange
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
@@ -76,7 +76,14 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             )
         }
         composable(BottomNavItem.Grades.screenRoute) {
-            Grades(onTypeClick = { type -> navController.navigate(NavItem.GradesByType.screenRoute + "/" + type) })
+            Grades(
+                onGradesTypeClick = { type ->
+                    navController.navigate(NavItem.GradesByType.screenRoute + "/" + type)
+                },
+                onProgressTypeClick = { type ->
+                    navController.navigate(NavItem.ProgressByType.screenRoute + "/" + type)
+                }
+            )
         }
         composable(
             NavItem.GradesByType.screenRoute + "/{type}",
@@ -84,17 +91,42 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
         ) { backStackEntry ->
             backStackEntry?.arguments?.getString("type")?.let { type ->
 
-                GradesByType(onGradeClick = {id -> navController.navigate(NavItem.GradeChange.screenRoute+"/"+id)},
-                    onBackClick = {navController.popBackStack()},
-                    type = type)
+                GradesByType(
+                    onGradeClick = { id -> navController.navigate(NavItem.GradeChange.screenRoute + "/" + id) },
+                    onBackClick = { navController.popBackStack() },
+                    type = type
+                )
             }
-
         }
-        composable(NavItem.GradeChange.screenRoute+"/{id}",
-            arguments = listOf(navArgument("id") {type = NavType.StringType })
+        composable(
+            NavItem.ProgressByType.screenRoute + "/{type}",
+            arguments = listOf(navArgument("type") { type = NavType.StringType })
+        ) {
+            ProgressByType(
+                onSummaryAndTypeClick = { summary, type ->
+                    navController.navigate(NavItem.ProgressBySummaryAndType.screenRoute + "/$type/$summary")
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable(
+            NavItem.ProgressBySummaryAndType.screenRoute + "/{type}/{summary}",
+            arguments = listOf(
+                navArgument("type") { type = NavType.StringType },
+                navArgument("summary") { type = NavType.StringType }
+            )
+        ) {
+            ProgressBySummaryAndType(
+                onEventClick = { navController.navigate(NavItem.GradeChange.screenRoute + "/$it") },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable(
+            NavItem.GradeChange.screenRoute + "/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry?.arguments?.getString("id")?.let{id ->
-                GradeChange(eventId = id, onBackClicked = {navController.popBackStack()})
+            backStackEntry?.arguments?.getString("id")?.let { id ->
+                GradeChange(eventId = id, onBackClicked = { navController.popBackStack() })
             }
 
         }

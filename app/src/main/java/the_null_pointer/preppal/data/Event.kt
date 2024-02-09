@@ -64,6 +64,14 @@ data class Event(
                 }
 
             val CompletableTypes = listOf(Lecture, Exam, Practice, Task, Seminar)
+
+            val Type.completionStringResourceId: Int
+                get() = when (this) {
+                    Lecture, Practice, Seminar -> R.string.attended
+                    Exam -> R.string.passed
+                    Task -> R.string.done
+                    else -> R.string.done
+                }
         }
     }
 

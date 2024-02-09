@@ -13,9 +13,15 @@ import javax.inject.Inject
 
 data class GradesScreenUiState(
     val events: List<Event> = emptyList(),
-    val gradedEvents: List<Event> = emptyList()
+    val gradedEvents: List<Event> = emptyList(),
+    val progressListItems: List<ProgressListItem> = emptyList()
+)
 
-    )
+data class ProgressListItem(
+    val eventType: Event.Type,
+    val completedCount: Int,
+    val totalCount: Int
+)
 
 @HiltViewModel
 class GradesViewModel @Inject constructor(private val eventRepository: EventRepository) :
@@ -31,11 +37,16 @@ class GradesViewModel @Inject constructor(private val eventRepository: EventRepo
 
             val uniqueGradedEventTypes = HashSet<String>()
             val filteredGradedEvents = events.filter { event ->
-                val isUnique = if (event.graded)  (uniqueGradedEventTypes.add(event.type.toString())) else false
+                val isUnique =
+                    if (event.graded) (uniqueGradedEventTypes.add(event.type.toString())) else false
                 isUnique
             }
             // Create GradesScreenUiState with filtered events
-            GradesScreenUiState(events = filteredEvents, gradedEvents = filteredGradedEvents)
+            GradesScreenUiState(
+                events = filteredEvents,
+                gradedEvents = filteredGradedEvents,
+                progressListItems = events.mapToProgressListItems()
+            )
         }
         .stateIn(
             viewModelScope,
@@ -43,5 +54,14 @@ class GradesViewModel @Inject constructor(private val eventRepository: EventRepo
             GradesScreenUiState()
         )
 
-
+    private fun List<Event>.mapToProgressListItems(): List<ProgressListItem> = this
+        .filter { it.completed != null }
+        .groupBy { it.type }
+        .map { (eventType, eventsOfType) ->
+            ProgressListItem(
+                eventType = eventType,
+                completedCount = eventsOfType.count { it.completed == true },
+                totalCount = eventsOfType.size
+            )
+        }
 }
