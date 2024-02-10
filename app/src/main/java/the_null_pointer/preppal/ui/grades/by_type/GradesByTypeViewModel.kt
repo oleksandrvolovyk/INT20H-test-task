@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.EventRepository
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.EventRepository
 import javax.inject.Inject
 
 data class GradesByTypeScreenUiState(

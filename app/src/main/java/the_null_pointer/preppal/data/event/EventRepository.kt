@@ -1,6 +1,7 @@
-package the_null_pointer.preppal.data
+package the_null_pointer.preppal.data.event
 
 import kotlinx.coroutines.flow.Flow
+import the_null_pointer.preppal.data.event.model.Event
 
 interface EventRepository {
     fun observeEvents(): Flow<List<Event>>

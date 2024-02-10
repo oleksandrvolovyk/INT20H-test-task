@@ -40,10 +40,10 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Event.RecurrenceType.Companion.stringResourceId
-import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
-import the_null_pointer.preppal.data.TimestampMillis
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.model.Event.RecurrenceType.Companion.stringResourceId
+import the_null_pointer.preppal.data.event.model.Event.Type.Companion.stringResourceId
+import the_null_pointer.preppal.data.event.model.TimestampMillis
 import the_null_pointer.preppal.ui.widget.MapView
 import the_null_pointer.preppal.ui.widget.MultiChoiceSpinner
 import the_null_pointer.preppal.ui.widget.MyDatePickerDialog

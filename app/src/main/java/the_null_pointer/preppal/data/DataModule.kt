@@ -8,6 +8,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import the_null_pointer.preppal.data.educational_resource.EducationalResourceDAO
+import the_null_pointer.preppal.data.educational_resource.EducationalResourceRepository
+import the_null_pointer.preppal.data.educational_resource.EducationalResourceRepositoryImpl
+import the_null_pointer.preppal.data.event.EventDAO
+import the_null_pointer.preppal.data.event.EventRepository
+import the_null_pointer.preppal.data.event.EventRepositoryImpl
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -29,10 +35,25 @@ object DataModule {
 
     @Provides
     @Singleton
+    fun provideEducationalResourceDAO(appDatabase: AppDatabase): EducationalResourceDAO {
+        return appDatabase.educationalResourceDAO()
+    }
+
+    @Provides
+    @Singleton
     fun provideEventRepository(
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
         eventDAO: EventDAO
     ): EventRepository {
         return EventRepositoryImpl(ioDispatcher, eventDAO)
+    }
+
+    @Provides
+    @Singleton
+    fun provideEducationalResourceRepository(
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        educationalResourceDAO: EducationalResourceDAO
+    ): EducationalResourceRepository {
+        return EducationalResourceRepositoryImpl(ioDispatcher, educationalResourceDAO)
     }
 }

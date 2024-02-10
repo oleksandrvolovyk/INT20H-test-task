@@ -32,7 +32,8 @@ fun <T> Spinner(
     cardColors: CardColors = CardDefaults.outlinedCardColors(),
     initialExpandedState: Boolean = false,
     canSelectNothing: Boolean = false,
-    nothingOptionString: String = ""
+    nothingOptionString: String = "",
+    maxLines: Int = Int.MAX_VALUE
 ) {
     var expanded by remember { mutableStateOf(initialExpandedState) }
 
@@ -50,7 +51,8 @@ fun <T> Spinner(
                 text = items.find { it.first == selected }?.second ?: nothingOptionString,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                maxLines = maxLines
             )
             Icon(Icons.Outlined.ArrowDropDown, null, modifier = Modifier.padding(8.dp))
 

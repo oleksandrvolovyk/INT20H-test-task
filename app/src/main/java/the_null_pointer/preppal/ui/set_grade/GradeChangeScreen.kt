@@ -35,9 +35,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Event.Type.Companion.completionStringResourceId
-import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.model.Event.Type.Companion.completionStringResourceId
+import the_null_pointer.preppal.data.event.model.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.widget.CheckboxWithoutPadding
 import the_null_pointer.preppal.util.TimeUtil.getReadableDate
 

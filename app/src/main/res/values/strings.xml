@@ -65,4 +65,15 @@
     <string name="graded">Оцінено\n%1$s/%2$s</string>
     <string name="grades_of_summary_and_type">Журнал оцінок: %2$s\n%1$s</string>
     <string name="access_type_grades">Відкрити оцінки %1$s</string>
+    <string name="educational_resources">Ресурси для підготовки</string>
+    <string name="literature">Література</string>
+    <string name="online_course">Онлайн-курс</string>
+    <string name="resource">Ресурс</string>
+    <string name="add_new_educational_resource">Додати новий навчальний ресурс</string>
+    <string name="set_resource_as_favourite">Відзначити ресурс</string>
+    <string name="set_resource_as_not_favourite">Не відзначити ресурс</string>
+    <string name="submit">Створити</string>
+    <string name="educational_resource_name">Назва ресурсу</string>
+    <string name="educational_resource_link">Посилання на ресурс</string>
+    <string name="resource_name_empty">Назва ресурсу не може бути пустою!</string>
 </resources>

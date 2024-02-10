@@ -1,9 +1,10 @@
-package the_null_pointer.preppal.data
+package the_null_pointer.preppal.data.event
 
 import androidx.room.TypeConverter
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import the_null_pointer.preppal.data.event.model.TimestampMillis
 
 class TimestampListConverter {
     @TypeConverter

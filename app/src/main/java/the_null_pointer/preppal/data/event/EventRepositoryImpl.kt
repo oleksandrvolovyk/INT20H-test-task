@@ -1,8 +1,9 @@
-package the_null_pointer.preppal.data
+package the_null_pointer.preppal.data.event
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import the_null_pointer.preppal.data.event.model.Event
 
 class EventRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher,

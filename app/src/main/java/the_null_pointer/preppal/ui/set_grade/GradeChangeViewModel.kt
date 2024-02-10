@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.EventRepository
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.EventRepository
 import the_null_pointer.preppal.ui.SideEffect
 import javax.inject.Inject
 

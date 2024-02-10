@@ -58,9 +58,9 @@ import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Event.Type.Companion.completionStringResourceId
-import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.model.Event.Type.Companion.completionStringResourceId
+import the_null_pointer.preppal.data.event.model.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 import the_null_pointer.preppal.ui.widget.CheckboxWithoutPadding
 import the_null_pointer.preppal.util.TimeUtil.getHourAsString

@@ -1,4 +1,4 @@
-package the_null_pointer.preppal.data
+package the_null_pointer.preppal.data.event
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import the_null_pointer.preppal.data.event.model.Event
 
 @Dao
 interface EventDAO {

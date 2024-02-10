@@ -84,6 +84,9 @@ dependencies {
     // kizitonwose/Calendar
     implementation("com.kizitonwose.calendar:compose:2.5.0-beta01")
 
+    //Swipe
+    implementation("me.saket.swipe:swipe:1.1.1")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")

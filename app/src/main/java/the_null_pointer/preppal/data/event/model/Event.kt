@@ -1,4 +1,4 @@
-package the_null_pointer.preppal.data
+package the_null_pointer.preppal.data.event.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import the_null_pointer.preppal.R
+import the_null_pointer.preppal.data.event.TimestampListConverter
 
 @Entity
 data class Event(
@@ -93,7 +94,7 @@ data class Event(
     companion object {
         val Empty = Event(
             summary = "",
-            type = Event.Type.Task,
+            type = Type.Task,
             start = 0,
             end = 0
         )

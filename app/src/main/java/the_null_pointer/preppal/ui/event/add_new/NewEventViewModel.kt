@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.EventRepository
-import the_null_pointer.preppal.data.Location
-import the_null_pointer.preppal.data.TimestampMillis
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.EventRepository
+import the_null_pointer.preppal.data.event.model.Location
+import the_null_pointer.preppal.data.event.model.TimestampMillis
 import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.ui.event.BaseEventScreenUiState
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY

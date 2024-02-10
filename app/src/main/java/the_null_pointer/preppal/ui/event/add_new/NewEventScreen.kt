@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.TimestampMillis
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.data.event.model.TimestampMillis
 import the_null_pointer.preppal.ui.event.BaseEventScreen
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
