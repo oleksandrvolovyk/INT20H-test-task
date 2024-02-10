@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -204,7 +203,7 @@ fun GradeRow(gradeListItem: GradeListItem, onTypeClick: (String) -> Unit = {}) {
 
 @Composable
 fun ProgressRow(progressListItem: ProgressListItem, onTypeClick: (String) -> Unit) {
-    Card(
+    OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)

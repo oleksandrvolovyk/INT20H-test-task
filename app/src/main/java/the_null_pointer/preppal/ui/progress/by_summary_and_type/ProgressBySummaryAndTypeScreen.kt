@@ -278,7 +278,9 @@ fun ProgressRow(
                 text = "${stringResource(id = eventType.stringResourceId)}\n${eventSummary}",
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(1.5f)
+                    .weight(1.5f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = progressBySummaryAndTypeListItem.time,
@@ -321,25 +323,29 @@ fun EducationalResourceRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row {
-            Text(stringResource(educationalResourceListItem.type.stringResourceId) + ": ")
+        Text(stringResource(educationalResourceListItem.type.stringResourceId) + ": ")
 
-            val url = educationalResourceListItem.link
-            val context = LocalContext.current
+        val url = educationalResourceListItem.link
+        val context = LocalContext.current
 
-            if (Patterns.WEB_URL.matcher(url).matches()) {
-                ClickableText(
-                    text = AnnotatedString(educationalResourceListItem.name),
-                    style = LocalTextStyle.current.copy(textDecoration = TextDecoration.Underline)
-                ) {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    context.startActivity(browserIntent)
-                }
-            } else {
-                Text(
-                    text = AnnotatedString(educationalResourceListItem.name)
-                )
+        if (Patterns.WEB_URL.matcher(url).matches()) {
+            ClickableText(
+                modifier = Modifier.weight(1f),
+                text = AnnotatedString(educationalResourceListItem.name),
+                style = LocalTextStyle.current.copy(textDecoration = TextDecoration.Underline),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            ) {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(browserIntent)
             }
+        } else {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = AnnotatedString(educationalResourceListItem.name),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
         if (educationalResourceListItem.favourite) {

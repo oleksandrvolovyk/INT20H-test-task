@@ -118,7 +118,9 @@ fun ProgressRow(
                 text = "${stringResource(id = eventType.stringResourceId)}\n${eventSummary}",
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(1.5f)
+                    .weight(1.5f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = gradesBySummaryAndTypeListItem.time,

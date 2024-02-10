@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -91,7 +91,7 @@ fun ProgressRow(
     progressListItem: ProgressByTypeListItem,
     onSummaryAndTypeClick: (summary: String, type: Event.Type) -> Unit
 ) {
-    Card(
+    OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
@@ -111,10 +111,12 @@ fun ProgressRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(eventType.stringResourceId) + ": " + progressListItem.eventSummary,
+                text = stringResource(eventType.stringResourceId) + "\n" + progressListItem.eventSummary,
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(0.8f)
+                    .weight(0.8f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
 
             Text(

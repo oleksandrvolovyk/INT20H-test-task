@@ -126,7 +126,9 @@ fun GradeRow(
                 text = "${stringResource(eventType.stringResourceId)}\n${gradesByTypeListItem.eventSummary}",
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(1.5f)
+                    .weight(1.5f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = stringResource(
