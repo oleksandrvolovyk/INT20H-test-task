@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -180,6 +181,12 @@ fun CalendarScreen(
                         .fillMaxWidth()
                         .height(300.dp)
                 ) {
+                    if (selection != null && eventsInSelectedDate.isEmpty()) {
+                        item {
+                            NoEventsThisDay(modifier = Modifier.fillMaxWidth().padding(4.dp))
+                        }
+                    }
+
                     items(items = eventsInSelectedDate) { event ->
                         EventInformation(
                             modifier = Modifier.clickable { onEventClick(event.id) },
@@ -191,6 +198,18 @@ fun CalendarScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun NoEventsThisDay(
+    modifier: Modifier = Modifier
+) {
+    Card(modifier = modifier) {
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = stringResource(R.string.no_events_this_day)
+        )
     }
 }
 
