@@ -23,6 +23,9 @@ import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_HOUR
 import the_null_pointer.preppal.util.TimeUtil.isWeekend
 import the_null_pointer.preppal.util.TimeUtil.isWorkingDay
+import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
 import javax.inject.Inject
 
 data class NewEventScreenUiState(
@@ -48,10 +51,18 @@ class NewEventViewModel @Inject constructor(
     private val eventRepository: EventRepository
 ) : ViewModel() {
 
+    private val timezone = TimeZone.getDefault()
+
+    private val timezoneOffset = if (timezone.inDaylightTime(Date())) {
+        timezone.rawOffset + timezone.dstSavings
+    } else {
+        timezone.rawOffset
+    }
+
     private val startingEpochDay = savedStateHandle.get<Long>("startingEpochDay")
     private val startingTimestampMillis = if (startingEpochDay != null) {
         // Day in millis + Hour and minutes in millis
-        startingEpochDay * MILLISECONDS_IN_DAY + System.currentTimeMillis() % MILLISECONDS_IN_DAY
+        startingEpochDay * MILLISECONDS_IN_DAY + (Calendar.getInstance().timeInMillis + timezoneOffset) % MILLISECONDS_IN_DAY
     } else {
         System.currentTimeMillis()
     }
