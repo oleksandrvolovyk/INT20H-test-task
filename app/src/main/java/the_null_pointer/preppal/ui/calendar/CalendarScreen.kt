@@ -70,6 +70,7 @@ import java.time.YearMonth
 
 private val pageBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.background
 private val itemBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.tertiaryContainer
+private val inactiveItemBackgroundColor: Color @Composable get() = MaterialTheme.colorScheme.background
 private val toolbarColor: Color @Composable get() = MaterialTheme.colorScheme.tertiaryContainer
 private val selectedItemBorderColor: Color @Composable get() = MaterialTheme.colorScheme.secondary
 private val inActiveTextColor: Color @Composable get() = MaterialTheme.colorScheme.onTertiaryContainer
@@ -208,7 +209,13 @@ private fun Day(
                 color = if (isSelected) selectedItemBorderColor else Color.Transparent,
             )
             .padding(1.dp)
-            .background(color = itemBackgroundColor)
+            .then(
+                if (day.position == DayPosition.MonthDate) {
+                    Modifier.background(color = itemBackgroundColor)
+                } else {
+                    Modifier.background(color = inactiveItemBackgroundColor)
+                }
+            )
             // Disable clicks on inDates/outDates
             .clickable(
                 enabled = day.position == DayPosition.MonthDate,
