@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,9 +80,8 @@ fun GradeChangeScreen(
             )
         }
 
-        SimpleText(stringResource(uiState.event.type.stringResourceId))
-        SimpleText(uiState.event.start.getReadableDate())
         SimpleText(uiState.event.summary)
+        SimpleText(uiState.event.start.getReadableDate())
 
         // Display current and max grades
         if (uiState.event.graded) {
@@ -89,44 +89,35 @@ fun GradeChangeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                OutlinedTextField(
+
+                TextField(
+                    label = { Text(stringResource(R.string.get_grade)) },
                     modifier = Modifier
+                        .fillMaxWidth()
                         .weight(0.5f)
-                        .padding(start = 4.dp),
+                        .padding(start = 8.dp, end = 8.dp),
                     value = (uiState.event.grade ?: 0.0).toString(),
                     onValueChange = onCurrentGradeValueChange,
-                    placeholder = {
-                        Text(
-                            text = stringResource(R.string.get_grade),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
+                    maxLines = 1,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
                     )
                 )
-                Spacer(modifier = Modifier.width(16.dp))
 
-                OutlinedTextField(
+                TextField(
+                    label = { Text(stringResource(R.string.max_grade)) },
                     modifier = Modifier
+                        .fillMaxWidth()
                         .weight(0.5f)
-                        .padding(end = 4.dp),
+                        .padding(start = 8.dp, end = 8.dp),
                     value = (uiState.event.maxGrade ?: 0.0).toString(),
                     onValueChange = onMaxGradeValueChange,
-                    placeholder = {
-                        Text(
-                            text = stringResource(R.string.max_grade),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
+                    maxLines = 1,
+                    keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
-                    ),
-                    singleLine = true
+                    )
                 )
             }
         }

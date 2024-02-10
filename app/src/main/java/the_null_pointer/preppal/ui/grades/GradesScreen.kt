@@ -54,7 +54,6 @@ fun GradesScreen(
 ) {
 
     val scrollState = rememberScrollState()
-    var expanded by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,38 +78,6 @@ fun GradesScreen(
                         .padding(6.dp)
                 )
 
-                Button(
-                    modifier = Modifier
-                        .width(65.dp)
-                        .height(40.dp)
-                        .align(Alignment.TopStart),
-                    onClick = { expanded = true },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    )
-                ) {
-                    Text(
-                        "...",
-                        fontSize = 15.sp
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-
-                    // Add Sorting like show ONLY ENGLISH!!
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.sorting)) },
-                        onClick = { Log.d("GradesScreen", "${uiState.gradeListItems}") }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Settings") },
-                        onClick = { /* Handle settings! */ }
-                    )
-                }
             }
         }
 
