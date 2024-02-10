@@ -29,7 +29,8 @@ import the_null_pointer.preppal.ui.calendar.Calendar
 import the_null_pointer.preppal.ui.event.add_new.NewEvent
 import the_null_pointer.preppal.ui.event.edit.EditEvent
 import the_null_pointer.preppal.ui.grades.Grades
-import the_null_pointer.preppal.ui.grades_by_type.GradesByType
+import the_null_pointer.preppal.ui.grades.by_summary_and_type.GradesBySummaryAndType
+import the_null_pointer.preppal.ui.grades.by_type.GradesByType
 import the_null_pointer.preppal.ui.progress.by_summary_and_type.ProgressBySummaryAndType
 import the_null_pointer.preppal.ui.progress.by_type.ProgressByType
 import the_null_pointer.preppal.ui.set_grade.GradeChange
@@ -129,15 +130,29 @@ fun NavigationGraph(navController: NavHostController, contentPadding: PaddingVal
             exitTransition = { defaultExitTransition },
             popEnterTransition = { defaultPopEnterTransition },
             popExitTransition = { defaultPopExitTransition }
-        ) { backStackEntry ->
-            backStackEntry?.arguments?.getString("type")?.let { type ->
-
-                GradesByType(
-                    onGradeClick = { id -> navController.navigate(NavItem.GradeChange.screenRoute + "/" + id) },
-                    onBackClick = { navController.popBackStack() },
-                    type = type
-                )
-            }
+        ) {
+            GradesByType(
+                onSummaryAndTypeClick = { summary, type ->
+                    navController.navigate(NavItem.GradesBySummaryAndType.screenRoute + "/$type/$summary")
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = NavItem.GradesBySummaryAndType.screenRoute + "/{type}/{summary}",
+            arguments = listOf(
+                navArgument("type") { type = NavType.StringType },
+                navArgument("summary") { type = NavType.StringType }
+            ),
+            enterTransition = { defaultEnterTransition },
+            exitTransition = { defaultExitTransition },
+            popEnterTransition = { defaultPopEnterTransition },
+            popExitTransition = { defaultPopExitTransition }
+        ) {
+            GradesBySummaryAndType(
+                onEventClick = { navController.navigate(NavItem.GradeChange.screenRoute + "/$it") },
+                onBackClick = { navController.popBackStack() }
+            )
         }
         composable(
             route = NavItem.ProgressByType.screenRoute + "/{type}",

@@ -61,6 +61,14 @@ object TimeUtil {
     }
 
     /**
+     * Gets readable time and date from milliseconds.
+     * @return                  Time and date in format "14:42 10.02.2024"
+     */
+    fun Long.getReadableTimeAndDate(): String {
+        return "${getHourAsString()}:${getMinuteAsString()} ${getReadableDate()}"
+    }
+
+    /**
      * Determines if timestamp(in millis) is a working day.
      * @return                  true, if working day
      */

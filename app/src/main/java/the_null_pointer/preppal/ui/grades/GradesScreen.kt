@@ -38,11 +38,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.Event
 import the_null_pointer.preppal.data.Event.Type.Companion.completionStringResourceId
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.theme.PrepPalTheme
@@ -105,7 +105,7 @@ fun GradesScreen(
 
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.sorting)) },
-                        onClick = { Log.d("GradesScreen", "${uiState.events}") }
+                        onClick = { Log.d("GradesScreen", "${uiState.gradeListItems}") }
                     )
                     DropdownMenuItem(
                         text = { Text("Settings") },
@@ -120,13 +120,8 @@ fun GradesScreen(
                 .fillMaxWidth()
                 .height(300.dp)
         ) {
-            items(uiState.gradedEvents, key = { grade -> grade.id })
-            { grade ->
-                // Змінити умову на перевірку саме чи оцінюване завдання
-                if (grade.graded) {
-                    GradeRow(grade, onGradesTypeClick)
-                }
-
+            items(uiState.gradeListItems, key = { it.eventType }) {
+                GradeRow(it, onGradesTypeClick)
             }
         }
 
@@ -152,14 +147,12 @@ fun GradesScreen(
                 ProgressRow(it, onProgressTypeClick)
             }
         }
-
     }
-
 }
 
 
 @Composable
-fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {}) {
+fun GradeRow(gradeListItem: GradeListItem, onTypeClick: (String) -> Unit = {}) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -168,7 +161,7 @@ fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {}) {
             .padding(6.dp),
         border = androidx.compose.foundation.BorderStroke(
             width = 3.dp,
-            color =  MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp
@@ -178,26 +171,25 @@ fun GradeRow(grade: Event, onTypeClick: (String) -> Unit = {}) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-
-                //Add navigation in clickable !->
-
-                .clickable(onClick = { onTypeClick("${grade.type}") }),
+                .clickable(onClick = { onTypeClick(gradeListItem.eventType.toString()) }),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-
-            ) {
-
+        ) {
             Text(
-                text = stringResource(id = grade.type.stringResourceId),
+                text = stringResource(id = gradeListItem.eventType.stringResourceId),
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(1.8f)
+                    .weight(0.8f)
             )
             Text(
-                text = "",
+                text = stringResource(
+                    R.string.graded,
+                    gradeListItem.gradedCount,
+                    gradeListItem.totalCount
+                ),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(4.dp)
-                    .weight(0.9f)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_right),
@@ -230,7 +222,7 @@ fun ProgressRow(progressListItem: ProgressListItem, onTypeClick: (String) -> Uni
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .clickable(onClick = { onTypeClick("${progressListItem.eventType}") }),
+                .clickable(onClick = { onTypeClick(progressListItem.eventType.toString()) }),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -248,6 +240,7 @@ fun ProgressRow(progressListItem: ProgressListItem, onTypeClick: (String) -> Uni
                     progressListItem.completedCount.toString(),
                     progressListItem.totalCount.toString()
                 ),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(4.dp)
             )

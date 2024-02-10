@@ -12,9 +12,14 @@ import the_null_pointer.preppal.data.EventRepository
 import javax.inject.Inject
 
 data class GradesScreenUiState(
-    val events: List<Event> = emptyList(),
-    val gradedEvents: List<Event> = emptyList(),
+    val gradeListItems: List<GradeListItem> = emptyList(),
     val progressListItems: List<ProgressListItem> = emptyList()
+)
+
+data class GradeListItem(
+    val eventType: Event.Type,
+    val gradedCount: Int,
+    val totalCount: Int
 )
 
 data class ProgressListItem(
@@ -24,27 +29,13 @@ data class ProgressListItem(
 )
 
 @HiltViewModel
-class GradesViewModel @Inject constructor(private val eventRepository: EventRepository) :
-    ViewModel() {
+class GradesViewModel @Inject constructor(
+    private val eventRepository: EventRepository
+) : ViewModel() {
     val uiState: StateFlow<GradesScreenUiState> = eventRepository.observeEvents()
         .map { events ->
-            val uniqueEventTypes = HashSet<String>()
-            val filteredEvents = events.filter { event ->
-                val isUnique = uniqueEventTypes.add(event.type.toString())
-                isUnique
-            }
-
-
-            val uniqueGradedEventTypes = HashSet<String>()
-            val filteredGradedEvents = events.filter { event ->
-                val isUnique =
-                    if (event.graded) (uniqueGradedEventTypes.add(event.type.toString())) else false
-                isUnique
-            }
-            // Create GradesScreenUiState with filtered events
             GradesScreenUiState(
-                events = filteredEvents,
-                gradedEvents = filteredGradedEvents,
+                gradeListItems = events.mapToGradeListItems(),
                 progressListItems = events.mapToProgressListItems()
             )
         }
@@ -53,6 +44,17 @@ class GradesViewModel @Inject constructor(private val eventRepository: EventRepo
             SharingStarted.WhileSubscribed(5000),
             GradesScreenUiState()
         )
+
+    private fun List<Event>.mapToGradeListItems(): List<GradeListItem> = this
+        .filter { it.graded }
+        .groupBy { it.type }
+        .map { (eventType, eventsOfType) ->
+            GradeListItem(
+                eventType = eventType,
+                gradedCount = eventsOfType.count { it.grade != null },
+                totalCount = eventsOfType.size
+            )
+        }
 
     private fun List<Event>.mapToProgressListItems(): List<ProgressListItem> = this
         .filter { it.completed != null }

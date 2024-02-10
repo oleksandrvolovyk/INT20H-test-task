@@ -1,6 +1,5 @@
-package the_null_pointer.preppal.ui.progress.by_summary_and_type
+package the_null_pointer.preppal.ui.grades.by_type
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,12 +10,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,24 +29,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import the_null_pointer.preppal.R
 import the_null_pointer.preppal.data.Event
-import the_null_pointer.preppal.data.Event.Type.Companion.completionStringResourceId
 import the_null_pointer.preppal.data.Event.Type.Companion.stringResourceId
-import the_null_pointer.preppal.ui.widget.CheckboxWithoutPadding
+import the_null_pointer.preppal.ui.theme.PrepPalTheme
 
 @Composable
-fun ProgressBySummaryAndTypeScreen(
-    uiState: ProgressBySummaryAndTypeScreenUiState,
-    onEventClick: (eventId: Long) -> Unit = {},
-    onEventCompletionChange: (eventId: Long, completed: Boolean) -> Unit = { _, _ -> },
+fun GradesByTypeScreen(
+    uiState: GradesByTypeScreenUiState,
+    onSummaryAndTypeClick: (summary: String, type: Event.Type) -> Unit = { _, _ -> },
     onBackClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(state = rememberScrollState())
     ) {
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -59,13 +61,9 @@ fun ProgressBySummaryAndTypeScreen(
             )
 
             Text(
-                text = stringResource(
-                    R.string.progress_of_summary_and_type,
-                    uiState.eventSummary,
-                    stringResource(uiState.eventType.stringResourceId)
-                ),
+                text = stringResource(R.string.scoreBoard),
                 textAlign = TextAlign.Center,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 20.sp,
                 modifier = Modifier
@@ -75,27 +73,30 @@ fun ProgressBySummaryAndTypeScreen(
             )
         }
 
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(uiState.progressBySummaryAndTypeListItems, key = { it.time }) {
-                ProgressRow(
-                    eventSummary = uiState.eventSummary,
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .weight(0.8f)
+
+        ) {
+            items(uiState.gradesByTypeListItems, key = { it.eventSummary }) {
+                GradeRow(
                     eventType = uiState.eventType,
-                    progressBySummaryAndTypeListItem = it,
-                    onEventClick = onEventClick,
-                    onEventCompletionChange = onEventCompletionChange
+                    gradesByTypeListItem = it,
+                    onSummaryAndTypeClick = onSummaryAndTypeClick
                 )
             }
         }
     }
 }
 
+
 @Composable
-fun ProgressRow(
-    eventSummary: String,
+fun GradeRow(
     eventType: Event.Type,
-    progressBySummaryAndTypeListItem: ProgressBySummaryAndTypeListItem,
-    onEventClick: (eventId: Long) -> Unit,
-    onEventCompletionChange: (eventId: Long, completed: Boolean) -> Unit
+    gradesByTypeListItem: GradesByTypeListItem,
+    onSummaryAndTypeClick: (summary: String, type: Event.Type) -> Unit
 ) {
     OutlinedCard(
         modifier = Modifier
@@ -103,7 +104,7 @@ fun ProgressRow(
             .height(70.dp)
             .clip(shape = RoundedCornerShape(4.dp))
             .padding(6.dp),
-        border = BorderStroke(
+        border = androidx.compose.foundation.BorderStroke(
             width = 3.dp,
             color = MaterialTheme.colorScheme.outline
         ),
@@ -115,43 +116,51 @@ fun ProgressRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
-                .clickable { onEventClick(progressBySummaryAndTypeListItem.eventId) },
+                .clickable {
+                    onSummaryAndTypeClick(gradesByTypeListItem.eventSummary, eventType)
+                },
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${stringResource(id = eventType.stringResourceId)}\n${eventSummary}",
+                text = "${stringResource(eventType.stringResourceId)}\n${gradesByTypeListItem.eventSummary}",
                 modifier = Modifier
                     .padding(4.dp)
                     .weight(1.5f)
             )
             Text(
-                text = progressBySummaryAndTypeListItem.time,
+                text = stringResource(
+                    R.string.graded,
+                    gradesByTypeListItem.gradedCount,
+                    gradesByTypeListItem.totalCount
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(4.dp)
                     .weight(0.9f)
             )
-
-            Column(
+            Icon(
+                painter = painterResource(id = R.drawable.ic_arrow_right),
+                contentDescription = stringResource(
+                    R.string.access_type_grades,
+                    eventType
+                ),
                 modifier = Modifier
-                    .padding(4.dp)
-                    .weight(0.9f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(stringResource(eventType.completionStringResourceId))
-
-                CheckboxWithoutPadding(
-                    checked = progressBySummaryAndTypeListItem.completed,
-                    onCheckedChange = {
-                        onEventCompletionChange(
-                            progressBySummaryAndTypeListItem.eventId,
-                            it
-                        )
-                    }
-                )
-            }
+                    .size(48.dp)
+                    .padding(8.dp)
+            )
         }
+    }
+}
+
+@Preview
+@Composable
+fun GradesPreview() {
+    PrepPalTheme {
+        GradesByTypeScreen(
+            uiState = GradesByTypeScreenUiState(
+                Event.Type.Lecture
+            )
+        )
     }
 }

@@ -7,6 +7,7 @@ sealed class NavItem(var screenRoute: String) {
     object EditEvent : NavItem("edit-event")
     object GradeChange : NavItem("grade-change")
     object GradesByType: NavItem("grades-by-type")
+    object GradesBySummaryAndType: NavItem("grades-by-summary-and-type")
     object ProgressByType: NavItem("progress-by-type")
     object ProgressBySummaryAndType: NavItem("progress-by-summary-and-type")
 }
