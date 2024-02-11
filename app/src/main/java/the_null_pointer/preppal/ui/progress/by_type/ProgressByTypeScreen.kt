@@ -126,6 +126,7 @@ fun ProgressRow(
                     progressListItem.completedCount.toString(),
                     progressListItem.totalCount.toString()
                 ),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(4.dp)
             )

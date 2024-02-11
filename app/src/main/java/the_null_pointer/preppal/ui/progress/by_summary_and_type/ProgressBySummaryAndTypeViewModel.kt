@@ -20,7 +20,7 @@ import the_null_pointer.preppal.data.educational_resource.model.EducationalResou
 import the_null_pointer.preppal.data.event.EventRepository
 import the_null_pointer.preppal.data.event.model.Event
 import the_null_pointer.preppal.ui.SideEffect
-import the_null_pointer.preppal.util.TimeUtil.getReadableTimeAndDate
+import the_null_pointer.preppal.util.TimeUtil.getReadableTimePeriod
 import javax.inject.Inject
 
 data class ProgressBySummaryAndTypeScreenUiState(
@@ -103,7 +103,7 @@ class ProgressBySummaryAndTypeViewModel @Inject constructor(
             .map { event ->
                 ProgressBySummaryAndTypeListItem(
                     eventId = event.id,
-                    time = event.start.getReadableTimeAndDate(),
+                    time = event.start.getReadableTimePeriod(event.end),
                     completed = event.completed!!
                 )
             }

@@ -39,7 +39,7 @@ import the_null_pointer.preppal.data.event.model.Event
 import the_null_pointer.preppal.data.event.model.Event.Type.Companion.completionStringResourceId
 import the_null_pointer.preppal.data.event.model.Event.Type.Companion.stringResourceId
 import the_null_pointer.preppal.ui.widget.CheckboxWithoutPadding
-import the_null_pointer.preppal.util.TimeUtil.getReadableDate
+import the_null_pointer.preppal.util.TimeUtil.getReadableTimePeriod
 
 @Composable
 fun GradeChangeScreen(
@@ -80,7 +80,7 @@ fun GradeChangeScreen(
         }
 
         SimpleText(uiState.event.summary)
-        SimpleText(uiState.event.start.getReadableDate())
+        SimpleText(uiState.event.start.getReadableTimePeriod(uiState.event.end))
         SimpleText(uiState.event.location.toString())
 
         // Display current and max grades

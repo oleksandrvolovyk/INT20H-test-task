@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import the_null_pointer.preppal.data.event.model.Event
 import the_null_pointer.preppal.data.event.EventRepository
-import the_null_pointer.preppal.util.TimeUtil.getReadableTimeAndDate
+import the_null_pointer.preppal.data.event.model.Event
+import the_null_pointer.preppal.util.TimeUtil.getReadableTimePeriod
 import javax.inject.Inject
 
 data class GradesBySummaryAndTypeScreenUiState(
@@ -63,7 +63,7 @@ class GradesBySummaryAndTypeViewModel @Inject constructor(
             .map { event ->
                 GradesBySummaryAndTypeListItem(
                     eventId = event.id,
-                    time = event.start.getReadableTimeAndDate(),
+                    time = event.start.getReadableTimePeriod(event.end),
                     grade = event.grade,
                     maxGrade = event.maxGrade
                 )

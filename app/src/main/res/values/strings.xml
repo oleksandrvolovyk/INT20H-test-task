@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">PrepPal</string>
     <string name="scoreBoard">Журнал оцінок</string>
+    <string name="scoreboard_of_type">Журнал оцінок: %1$s</string>
     <string name="progress">Прогрес</string>
     <string name="sorting">Сортувати</string>
     <string name="get_grade">Отримана оцінка</string>

@@ -61,7 +61,10 @@ fun GradesByTypeScreen(
             )
 
             Text(
-                text = stringResource(R.string.scoreBoard),
+                text = stringResource(
+                    R.string.scoreboard_of_type,
+                    stringResource(uiState.eventType.stringResourceId)
+                ),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

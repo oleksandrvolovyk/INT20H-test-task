@@ -47,8 +47,16 @@ object TimeUtil {
     }
 
     /**
+     * Gets readable hour and minute from milliseconds as String.
+     * @return                  Hour and minute in format "08:33"
+     */
+    fun Long.getReadableTime(): String {
+        return this.getHourAsString() + ":" + this.getMinuteAsString()
+    }
+
+    /**
      * Gets readable date from milliseconds.
-     * @return                  Date.
+     * @return                  Date in format "22.02.2024"
      */
     fun Long.getReadableDate(): String {
         calendar.timeInMillis = this
@@ -61,8 +69,16 @@ object TimeUtil {
     }
 
     /**
+     * Gets readable time period from milliseconds.
+     * @return                  Time period in format "12:20-14:15 22.02.2024"
+     */
+    fun Long.getReadableTimePeriod(end: Long): String {
+        return this.getReadableTime() + "-" + end.getReadableTime() + " " + this.getReadableDate()
+    }
+
+    /**
      * Gets readable time and date from milliseconds.
-     * @return                  Time and date in format "14:42 10.02.2024"
+     * @return                  Time and date in format "14:42 22.02.2024"
      */
     fun Long.getReadableTimeAndDate(): String {
         return "${getHourAsString()}:${getMinuteAsString()} ${getReadableDate()}"
