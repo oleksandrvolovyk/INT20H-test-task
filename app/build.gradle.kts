@@ -4,6 +4,9 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.kapt")
     id("org.jetbrains.kotlin.plugin.serialization")
+
+    // Firebase
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -106,6 +109,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
