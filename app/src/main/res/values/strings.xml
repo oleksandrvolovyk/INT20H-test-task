@@ -7,6 +7,8 @@
     <string name="max_grade">Максимальна оцінка</string>
     <string name="add_event_to_calendar_first">Створіть подію у календарі</string>
     <string name="add_graded_event_to_calendar_first">Створіть оцінювану подію у календарі</string>
+    <string name="event_on_the_map">Подія на карті</string>
+
 
     <string name="add_new_event">Додати подію</string>
     <string name="OK">OK</string>

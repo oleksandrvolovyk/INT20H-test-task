@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -82,6 +81,7 @@ fun GradeChangeScreen(
 
         SimpleText(uiState.event.summary)
         SimpleText(uiState.event.start.getReadableDate())
+        SimpleText(uiState.event.location.toString())
 
         // Display current and max grades
         if (uiState.event.graded) {
@@ -124,17 +124,40 @@ fun GradeChangeScreen(
         }
 
         if (uiState.event.completed != null) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(stringResource(uiState.event.type.completionStringResourceId))
+            Row(modifier = Modifier.fillMaxWidth()){
 
-                CheckboxWithoutPadding(
-                    checked = uiState.event.completed,
-                    onCheckedChange = { onEventCompletionChange(it) }
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.9f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(stringResource(uiState.event.type.completionStringResourceId))
+
+                    CheckboxWithoutPadding(
+                        checked = uiState.event.completed,
+                        onCheckedChange = { onEventCompletionChange(it) }
+                    )
+
+                }
+                if(uiState.event.location !=null){
+                    Box( modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.9f),
+                        contentAlignment = Alignment.Center){
+
+                        Button(modifier = Modifier
+                            .width(145.dp)
+                            .height(50.dp)
+                            .padding(top = 5.dp),
+                            onClick = { /*TODO*/ },
+                        ) {
+                            Text(stringResource(R.string.event_on_the_map))
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -150,7 +173,8 @@ fun SimpleText(
             .fillMaxWidth()
             .height(70.dp)
 //            .clip(shape = CutCornerShape(1.dp))
-            .padding(6.dp),
+            .padding(6.dp)
+            .clickable { },
         border = BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.outline
