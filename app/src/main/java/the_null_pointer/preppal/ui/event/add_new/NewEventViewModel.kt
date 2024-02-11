@@ -256,7 +256,7 @@ class NewEventViewModel @Inject constructor(
             summary = currentUiState.summary,
             type = currentUiState.type,
             location = location,
-            locationName = currentUiState.locationName,
+            locationName = if (currentUiState.isLocationEnabled) currentUiState.locationName else null,
             start = currentUiState.start,
             end = currentUiState.end,
             recurrence = currentUiState.recurrenceType,
@@ -311,7 +311,7 @@ class NewEventViewModel @Inject constructor(
                         generateRecurrentEvents(
                             baseEvent = baseEvent,
                             recurrenceEndDayMillis = currentUiState.recurrenceEndDate,
-                            dayStep = 30 // TODO: Do something better or remove Monthly
+                            dayStep = 30
                         )
                     )
                 }
