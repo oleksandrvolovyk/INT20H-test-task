@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -81,6 +82,11 @@ fun GradesScreen(
             }
         }
 
+        if(uiState.gradeListItems.isEmpty()){
+            NoEventsYet(modifier = Modifier.fillMaxWidth().padding(10.dp),
+                text = stringResource(R.string.add_graded_event_to_calendar_first))
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -103,6 +109,12 @@ fun GradesScreen(
                     .padding(6.dp)
             )
         }
+
+        if(uiState.progressListItems.isEmpty()){
+            NoEventsYet(modifier = Modifier.fillMaxWidth().padding(10.dp),
+                text = stringResource(R.string.add_event_to_calendar_first))
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,6 +177,19 @@ fun GradeRow(gradeListItem: GradeListItem, onTypeClick: (String) -> Unit = {}) {
                     .padding(8.dp)
             )
         }
+    }
+}
+
+@Composable
+fun NoEventsYet(
+    modifier: Modifier = Modifier,
+    text: String
+) {
+    Card(modifier = modifier) {
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = text
+        )
     }
 }
 
