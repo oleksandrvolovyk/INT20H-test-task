@@ -77,6 +77,7 @@ interface BaseEventScreenUiState {
     val reminderOffsets: List<TimestampMillis>
 
     val isLocationEnabled: Boolean
+    val locationName: String?
     val locationLatitude: Double?
     val locationLongitude: Double?
 
@@ -375,39 +376,55 @@ fun BaseEventScreen(
             if (uiState.isLocationEnabled && uiState.locationLatitude != null
                 && uiState.locationLongitude != null && locationConfirmed
             ) {
-                Card(Modifier.size(200.dp)) {
-                    MapView { mapView ->
-                        Configuration.getInstance().userAgentValue =
-                            mapView.context.getString(R.string.app_name)
-                        mapView.setOnTouchListener { _, _ -> true }
-                        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-                        mapView.isTilesScaledToDpi = true
-
-                        mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
-                            if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
-                                mapView.zoomToBoundingBox(
-                                    GeoPoint(
-                                        uiState.locationLatitude!!,
-                                        uiState.locationLongitude!!
-                                    ).toBoundingBox(),
-                                    false
+                Column {
+                    if (uiState.locationName != null) {
+                        Card(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)) {
+                            Text(
+                                modifier = Modifier.padding(8.dp),
+                                text = stringResource(
+                                    R.string.location_name,
+                                    uiState.locationName ?: ""
                                 )
+                            )
+                        }
+                    }
 
-                                mapView.clearAllMarkers()
-                                mapView.addMarker(
-                                    latitude = uiState.locationLatitude!!,
-                                    longitude = uiState.locationLongitude!!,
-                                    text = "${
-                                        uiState.locationLatitude.toString().take(6)
-                                    }, " +
-                                            uiState.locationLongitude.toString().take(6)
-                                )
-                                mapView.controller.animateTo(
-                                    GeoPoint(
-                                        uiState.locationLatitude!!,
-                                        uiState.locationLongitude!!
+                    Card(Modifier.size(200.dp)) {
+                        MapView { mapView ->
+                            Configuration.getInstance().userAgentValue =
+                                mapView.context.getString(R.string.app_name)
+                            mapView.setOnTouchListener { _, _ -> true }
+                            mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                            mapView.isTilesScaledToDpi = true
+
+                            mapView.overlayManager.tilesOverlay.tileStates.runAfters.add {
+                                if (mapView.zoomLevelDouble == mapView.minZoomLevel) {
+                                    mapView.zoomToBoundingBox(
+                                        GeoPoint(
+                                            uiState.locationLatitude!!,
+                                            uiState.locationLongitude!!
+                                        ).toBoundingBox(),
+                                        false
                                     )
-                                )
+
+                                    mapView.clearAllMarkers()
+                                    mapView.addMarker(
+                                        latitude = uiState.locationLatitude!!,
+                                        longitude = uiState.locationLongitude!!,
+                                        text = "${
+                                            uiState.locationLatitude.toString().take(6)
+                                        }, " +
+                                                uiState.locationLongitude.toString().take(6)
+                                    )
+                                    mapView.controller.animateTo(
+                                        GeoPoint(
+                                            uiState.locationLatitude!!,
+                                            uiState.locationLongitude!!
+                                        )
+                                    )
+                                }
                             }
                         }
                     }

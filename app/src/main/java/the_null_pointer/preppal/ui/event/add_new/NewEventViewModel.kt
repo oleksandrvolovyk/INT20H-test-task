@@ -13,10 +13,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import the_null_pointer.preppal.R
-import the_null_pointer.preppal.data.event.model.Event
 import the_null_pointer.preppal.data.event.EventRepository
+import the_null_pointer.preppal.data.event.model.Event
 import the_null_pointer.preppal.data.event.model.Location
 import the_null_pointer.preppal.data.event.model.TimestampMillis
+import the_null_pointer.preppal.data.location_name.LocationNameDatasource
 import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.ui.event.BaseEventScreenUiState
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
@@ -39,6 +40,7 @@ data class NewEventScreenUiState(
     override val reminderOffsets: List<TimestampMillis> = emptyList(),
 
     override val isLocationEnabled: Boolean = false,
+    override val locationName: String? = null,
     override val locationLatitude: Double? = null,
     override val locationLongitude: Double? = null,
 
@@ -48,7 +50,8 @@ data class NewEventScreenUiState(
 @HiltViewModel
 class NewEventViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val locationNameDatasource: LocationNameDatasource
 ) : ViewModel() {
 
     private val timezone = TimeZone.getDefault()
@@ -181,6 +184,16 @@ class NewEventViewModel @Inject constructor(
                 locationLongitude = longitude
             )
         }
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    locationName = locationNameDatasource.getDisplayNameForLocation(
+                        latitude,
+                        longitude
+                    )
+                )
+            }
+        }
     }
 
     fun updateGradedState(newGradedState: Boolean) {
@@ -243,6 +256,7 @@ class NewEventViewModel @Inject constructor(
             summary = currentUiState.summary,
             type = currentUiState.type,
             location = location,
+            locationName = currentUiState.locationName,
             start = currentUiState.start,
             end = currentUiState.end,
             recurrence = currentUiState.recurrenceType,

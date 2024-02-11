@@ -82,4 +82,5 @@
     <string name="educational_resource_link">Посилання на ресурс</string>
     <string name="resource_name_empty">Назва ресурсу не може бути пустою!</string>
     <string name="no_events_this_day">У цей день немає подій</string>
+    <string name="location_name">Місце: %1$s</string>
 </resources>

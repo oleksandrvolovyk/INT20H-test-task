@@ -22,6 +22,9 @@ data class Event(
     @Embedded
     val location: Location? = null,
 
+    @ColumnInfo(name = "location_name")
+    val locationName: String? = null,
+
     @ColumnInfo(name = "start")
     val start: TimestampMillis,
 

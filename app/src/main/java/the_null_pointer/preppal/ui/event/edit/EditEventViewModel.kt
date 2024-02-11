@@ -17,6 +17,7 @@ import the_null_pointer.preppal.data.event.model.Event
 import the_null_pointer.preppal.data.event.EventRepository
 import the_null_pointer.preppal.data.event.model.Location
 import the_null_pointer.preppal.data.event.model.TimestampMillis
+import the_null_pointer.preppal.data.location_name.LocationNameDatasource
 import the_null_pointer.preppal.ui.SideEffect
 import the_null_pointer.preppal.ui.event.BaseEventScreenUiState
 import the_null_pointer.preppal.util.TimeUtil.MILLISECONDS_IN_DAY
@@ -34,6 +35,7 @@ data class EditEventScreenUiState(
     override val reminderOffsets: List<TimestampMillis> = emptyList(),
 
     override val isLocationEnabled: Boolean = false,
+    override val locationName: String? = null,
     override val locationLatitude: Double? = null,
     override val locationLongitude: Double? = null,
 
@@ -53,7 +55,8 @@ enum class EventEditMethod {
 @HiltViewModel
 class EditEventViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val locationNameDatasource: LocationNameDatasource
 ) : ViewModel() {
 
     private val eventId: Long = savedStateHandle["eventId"]!!
@@ -96,6 +99,7 @@ class EditEventViewModel @Inject constructor(
                         isReminderEnabled = event.reminder.isNotEmpty(),
                         reminderOffsets = event.reminder.map { reminderTimeMillis -> reminderTimeMillis - event.start },
                         isLocationEnabled = event.location != null,
+                        locationName = event.locationName,
                         locationLatitude = event.location?.latitude,
                         locationLongitude = event.location?.longitude,
                         isGraded = event.graded,
@@ -205,6 +209,16 @@ class EditEventViewModel @Inject constructor(
                 locationLongitude = longitude
             )
         }
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    locationName = locationNameDatasource.getDisplayNameForLocation(
+                        latitude,
+                        longitude
+                    )
+                )
+            }
+        }
     }
 
     fun updateGradedState(newGradedState: Boolean) {
@@ -244,6 +258,7 @@ class EditEventViewModel @Inject constructor(
                         summary = currentUiState.summary,
                         type = currentUiState.type,
                         location = location,
+                        locationName = currentUiState.locationName,
                         start = currentUiState.start,
                         end = currentUiState.end,
                         recurrence = originalEvent?.recurrence,
@@ -289,6 +304,7 @@ class EditEventViewModel @Inject constructor(
                             summary = currentUiState.summary,
                             type = currentUiState.type,
                             location = location,
+                            locationName = currentUiState.locationName,
                             start = newEventStartTimeMillis,
                             end = newEventEndTimeMillis,
                             recurrence = originalEvent?.recurrence,

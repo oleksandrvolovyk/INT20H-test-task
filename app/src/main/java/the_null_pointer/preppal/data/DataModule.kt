@@ -14,6 +14,10 @@ import the_null_pointer.preppal.data.educational_resource.EducationalResourceRep
 import the_null_pointer.preppal.data.event.EventDAO
 import the_null_pointer.preppal.data.event.EventRepository
 import the_null_pointer.preppal.data.event.EventRepositoryImpl
+import the_null_pointer.preppal.data.location_name.LocationNameDatasource
+import the_null_pointer.preppal.data.location_name.LocationNameDatasourceImpl
+import the_null_pointer.preppal.data.location_name.NominatimApi
+import the_null_pointer.preppal.data.location_name.NominatimApiClient
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -55,5 +59,20 @@ object DataModule {
         educationalResourceDAO: EducationalResourceDAO
     ): EducationalResourceRepository {
         return EducationalResourceRepositoryImpl(ioDispatcher, educationalResourceDAO)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNominatimApi(): NominatimApi {
+        return NominatimApiClient.client.create(NominatimApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationNameDatasource(
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        nominatimApi: NominatimApi
+    ): LocationNameDatasource {
+        return LocationNameDatasourceImpl(ioDispatcher, nominatimApi)
     }
 }
